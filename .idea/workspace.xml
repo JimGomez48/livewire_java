@@ -87,6 +87,7 @@
       <list>
         <option value="$PROJECT_DIR$/src/LivewireApp.java" />
         <option value="$PROJECT_DIR$/README" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -427,7 +428,14 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/README">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="0" selection-start="469" selection-end="469" vertical-scroll-proportion="0.47727272" vertical-offset="0" max-vertical-offset="572">
+        <state line="13" column="34" selection-start="475" selection-end="475" vertical-scroll-proportion="0.47727272" vertical-offset="0" max-vertical-offset="572">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="6" selection-start="17" selection-end="17" vertical-scroll-proportion="0.073426574" vertical-offset="0" max-vertical-offset="572">
           <folding />
         </state>
       </provider>
