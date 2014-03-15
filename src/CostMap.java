@@ -98,7 +98,8 @@ public class CostMap
         wavefront.add(current);
 
         int count = 0;
-        int step = (original.length * original[0].length)/50;
+        float size = (float)original.length * original[0].length;
+        int step = (int)size/20;
         System.out.println("Expanding graph...");
         while (!wavefront.isEmpty()){
             //get next lowest cost Node from wavefront and add to closed set
@@ -126,12 +127,13 @@ public class CostMap
             }
 
             if (count % step == 0){
+                System.out.println("Expanding:  " + (int)(100 * (count/size)) + "%");
                 opencv_highgui.cvShowImage(PROG_TITLE, image);
                 opencv_highgui.cvWaitKey(1);
             }
             count++;
         }
-        System.out.println("Done");
+        System.out.println("Expanding: 100%\nDone");
         opencv_highgui.cvShowImage(PROG_TITLE, image);
         opencv_highgui.cvWaitKey(1);
     }
