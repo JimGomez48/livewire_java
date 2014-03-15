@@ -10,3 +10,6 @@ out/*
 
 /out/production/livewire_java/*
 out/production/livewire_java/*
+
+*.jar
+src/META-INF/*
