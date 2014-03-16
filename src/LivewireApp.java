@@ -118,28 +118,42 @@ public class LivewireApp
         CvMat dir = CvMat.create(image.rows(), image.cols(), opencv_core.CV_16U, 1);
         for (int i = 0; i < image.rows(); i++) {
             for (int j = 0; j < image.cols(); j++) {
-                float angle = (float)Math.toDegrees(Math.atan2(gx.get(i, j), gy.get(i, j)));
+                float angle = (float)Math.toDegrees(Math.atan2(gy.get(i, j), gx.get(i, j)));
+//                float angle = (float)Math.atan2(gy.get(i, j), gx.get(i, j));
                 dir.put(i, j, angle);
             }
         }
-        opencv_core.cvConvertScale(dir, dir, 255.0/360.0, 0.0);
         gradient.dir.put(dir);
-        
-//        opencv_core.cvConvertScale(gradient.x, gradient.x, 1.0/2.0, 128);
-//        opencv_core.cvConvertScale(gradient.y, gradient.x, 1.0/2.0, 128);
-//        System.out.println(gradient.x);
-//        opencv_highgui.cvConvertImage(gradient.x, gradient.x, opencv_core.CV_8UC1);
 
         return gradient;
     }
 
     private CvMat getEdges(CvMat image){
-        //TODO
-        return null;
+        CvMat edges = CvMat.create(image.rows(), image.cols(), opencv_core.CV_8U, 1);
+        edges.put(image);
+        opencv_imgproc.GaussianBlur(
+                edges, edges,
+                new opencv_core.CvSize(3, 3),
+                0, 0,
+                opencv_imgproc.BORDER_DEFAULT
+        );
+        opencv_imgproc.Canny(edges, edges, 15, 45, 3, true);
+
+        return edges;
     }
 
     private CvMat getWeightedSum(GradStruct grad, CvMat edges, float wg, float wz, float wd){
         CvMat sum = CvMat.create(image.rows(), image.cols(), image.type(), 1);
+        CvMat gradMag = CvMat.create(image.rows(), image.cols(), opencv_core.CV_8U, 1);
+        CvMat graddir = CvMat.create(image.rows(), image.cols(), opencv_core.CV_8U, 1);
+        CvMat gEdges = CvMat.create(image.rows(), image.cols(), opencv_core.CV_8U, 1);
+        opencv_core.cvScale(grad.mag, gradMag, wg, 0.0);
+        opencv_core.cvScale(grad.dir, graddir, wd, 0.0);
+        opencv_core.cvScale(edges, gEdges, wz, 0.0);
+
+        opencv_core.cvAdd(gradMag, graddir, sum, null);
+        opencv_core.cvAdd(sum, gEdges, sum, null);
+        opencv_core.cvNot(sum, sum);
 
         return sum;
     }

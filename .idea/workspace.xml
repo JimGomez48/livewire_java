@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4bda0a93-b781-4b99-b5aa-d7b695a22eb8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/brain.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/coin.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/color.PNG" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/grayscale.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/invert_sum.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/CostMap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/LivewireApp.java" afterPath="$PROJECT_DIR$/src/LivewireApp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/livewire_java.iml" afterPath="$PROJECT_DIR$/livewire_java.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="livewire_java.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -80,11 +69,13 @@
       <file leaf-file-name="LivewireApp.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/LivewireApp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="67" selection-start="1162" selection-end="1162" vertical-scroll-proportion="0.44354838" vertical-offset="14" max-vertical-offset="3297">
+            <state line="87" column="10" selection-start="3199" selection-end="3199" vertical-scroll-proportion="0.51152074" vertical-offset="1026" max-vertical-offset="3339">
               <folding>
                 <element signature="docComment;class#LivewireApp#0" expanded="false" />
                 <element signature="class#GradStruct#0;class#LivewireApp#0" expanded="false" />
+                <element signature="e#1035#2068#0" expanded="true" />
                 <element signature="e#2057#2058#0" expanded="true" />
+                <element signature="method#getEdges#0;class#LivewireApp#0" expanded="false" />
                 <element signature="method#showImage#0;class#LivewireApp#0" expanded="false" />
                 <element signature="method#showFeatures#0;class#LivewireApp#0" expanded="false" />
                 <element signature="method#typeToString#0;class#LivewireApp#0" expanded="false" />
@@ -95,11 +86,23 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="README" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="13" column="2" selection-start="471" selection-end="471" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="399">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="opencv_highgui.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_highgui.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="199" column="27" selection-start="8711" selection-end="8711" vertical-scroll-proportion="0.0" vertical-offset="2714" max-vertical-offset="10899">
-              <folding />
+              <folding>
+                <element signature="e#0#25556#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -381,7 +384,7 @@
     <configuration default="false" name="Livewire" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="LivewireApp" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="res/coin.jpg" />
+      <option name="PROGRAM_PARAMETERS" value="res/mri_1.jpg" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -439,9 +442,29 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -454,13 +477,13 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.32998884" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20309168" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998884" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20309168" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3768116" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -495,7 +518,9 @@
           <folding>
             <element signature="docComment;class#LivewireApp#0" expanded="false" />
             <element signature="class#GradStruct#0;class#LivewireApp#0" expanded="false" />
+            <element signature="e#1035#2068#0" expanded="true" />
             <element signature="e#2057#2058#0" expanded="true" />
+            <element signature="method#getEdges#0;class#LivewireApp#0" expanded="false" />
             <element signature="method#showImage#0;class#LivewireApp#0" expanded="false" />
             <element signature="method#showFeatures#0;class#LivewireApp#0" expanded="false" />
             <element signature="method#typeToString#0;class#LivewireApp#0" expanded="false" />
@@ -510,11 +535,6 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="189" max-vertical-offset="12957">
           <folding />
         </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="34" selection-start="475" selection-end="475" vertical-scroll-proportion="0.47727272" vertical-offset="0" max-vertical-offset="572" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
@@ -567,13 +587,6 @@
     <entry file="jar://$PROJECT_DIR$/lib/javacv-bin/javacpp.jar!/com/googlecode/javacpp/ShortPointer.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="13" selection-start="165" selection-end="165" vertical-scroll-proportion="0.21649484" vertical-offset="0" max-vertical-offset="945">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_imgproc.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="731" column="30" selection-start="28816" selection-end="28816" vertical-scroll-proportion="0.33333334" vertical-offset="13428" max-vertical-offset="27531">
           <folding />
         </state>
       </provider>
@@ -670,17 +683,36 @@
     <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_highgui.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="199" column="27" selection-start="8711" selection-end="8711" vertical-scroll-proportion="0.0" vertical-offset="2714" max-vertical-offset="10899">
+          <folding>
+            <element signature="e#0#25556#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="2" selection-start="471" selection-end="471" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="399">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_imgproc.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1293" column="47" selection-start="65667" selection-end="65667" vertical-scroll-proportion="0.33333334" vertical-offset="25230" max-vertical-offset="27531">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/LivewireApp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="67" selection-start="1162" selection-end="1162" vertical-scroll-proportion="0.44354838" vertical-offset="14" max-vertical-offset="3297">
+        <state line="87" column="10" selection-start="3199" selection-end="3199" vertical-scroll-proportion="0.51152074" vertical-offset="1026" max-vertical-offset="3339">
           <folding>
             <element signature="docComment;class#LivewireApp#0" expanded="false" />
             <element signature="class#GradStruct#0;class#LivewireApp#0" expanded="false" />
+            <element signature="e#1035#2068#0" expanded="true" />
             <element signature="e#2057#2058#0" expanded="true" />
+            <element signature="method#getEdges#0;class#LivewireApp#0" expanded="false" />
             <element signature="method#showImage#0;class#LivewireApp#0" expanded="false" />
             <element signature="method#showFeatures#0;class#LivewireApp#0" expanded="false" />
             <element signature="method#typeToString#0;class#LivewireApp#0" expanded="false" />
