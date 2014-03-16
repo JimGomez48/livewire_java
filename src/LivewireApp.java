@@ -29,7 +29,15 @@ public class LivewireApp
     public LivewireApp(String path)
     {
         image = opencv_highgui.cvLoadImageM(path, opencv_core.CV_8UC1);
-        costMap = new CostMap(image);
+    }
+
+    public void run()
+    {
+        GradStruct gradient = getGradient(image);
+        CvMat edges = getEdges(image);
+        CvMat sum = getWeightedSum(gradient, edges, 0.80f, 0.25f, 0.15f);
+        costMap = new CostMap(sum);
+//        showFeatures(gradient, edges, sum);
 
         showImage(APP_TITLE, image, 100, 100);
         opencv_highgui.cvSetMouseCallback(APP_TITLE, new opencv_highgui.CvMouseCallback(){
@@ -38,32 +46,25 @@ public class LivewireApp
             {
                 switch (event){
                     case opencv_highgui.CV_EVENT_LBUTTONDOWN:
-                        System.out.println("Left Down");
+                        System.out.println("Left Down" + " row:" + y + " col:" + x);
+                        costMap.addSeed(y, x);
                         break;
                     case opencv_highgui.CV_EVENT_LBUTTONUP:
-                        System.out.println("Left Up");
+//                        System.out.println("Left Up" + " row:" + y + " col:" + x);
                         break;
                     case opencv_highgui.CV_EVENT_RBUTTONDOWN:
-                        System.out.println("Right Down");
+//                        System.out.println("Right Down" + " row:" + y + " col:" + x);
                         break;
                     case opencv_highgui.CV_EVENT_RBUTTONUP:
-                        System.out.println("Right Up");
+//                        System.out.println("Right Up" + " row:" + y + " col:" + x);
                         break;
                     case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
-                        System.out.println("Double Click");
+//                        System.out.println("Double Click" + " row:" + y + " col:" + x);
                         break;
                 }
 //                super.call(event, x, y, flags, param);
             }
         },null);
-    }
-
-    public void run()
-    {
-        GradStruct gradient = getGradient(image);
-        CvMat edges = getEdges(image);
-        CvMat sum = getWeightedSum(gradient, edges, 0.80f, 0.25f, 0.15f);
-        showFeatures(gradient, edges, sum);
 
         opencv_highgui.cvWaitKey(0);
     }
