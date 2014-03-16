@@ -1,4 +1,8 @@
+/out/
 out/
 out/*
+/out/*
 .idea/
 .idea/*
+/out/production/livewire_java/*
+out/production/livewire_java/*
