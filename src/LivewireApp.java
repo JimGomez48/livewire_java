@@ -37,7 +37,7 @@ public class LivewireApp
         CvMat edges = getEdges(image);
         CvMat sum = getWeightedSum(gradient, edges, 0.80f, 0.25f, 0.15f);
         costMap = new CostMap(sum);
-//        showFeatures(gradient, edges, sum);
+        showFeatures(gradient, edges, sum);
 
         showImage(APP_TITLE, image, 100, 100);
         opencv_highgui.cvSetMouseCallback(APP_TITLE, new opencv_highgui.CvMouseCallback(){
