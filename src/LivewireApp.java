@@ -159,12 +159,12 @@ public class LivewireApp
         return sum;
     }
 
-    private void showImage(String title, CvMat image){
+    public static void showImage(String title, CvMat image){
         opencv_highgui.cvNamedWindow(title);
         opencv_highgui.cvShowImage(title, image);
     }
 
-    private void showImage(String title, CvMat image, int x, int y){
+    public static void showImage(String title, CvMat image, int x, int y){
         opencv_highgui.cvNamedWindow(title);
         opencv_highgui.cvMoveWindow(title, x, y);
         opencv_highgui.cvShowImage(title, image);

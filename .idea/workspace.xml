@@ -59,7 +59,7 @@
     </breakpoint_any>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/CostMap.java" line="84" class="CostMap" package="">
+      <breakpoint url="file://$PROJECT_DIR$/src/CostMap.java" line="89" class="CostMap" package="">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -74,7 +74,22 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/CostMap.java" line="60" class="CostMap" package="">
+      <breakpoint url="file://$PROJECT_DIR$/src/CostMap.java" line="108" class="CostMap" package="">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/CostMap.java" line="102" class="CostMap" package="">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -102,7 +117,7 @@
       <file leaf-file-name="LivewireApp.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/LivewireApp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="48" selection-start="2406" selection-end="2406" vertical-scroll-proportion="0.0" vertical-offset="224" max-vertical-offset="3297">
+            <state line="161" column="17" selection-start="6473" selection-end="6473" vertical-scroll-proportion="0.0" vertical-offset="2429" max-vertical-offset="3297">
               <folding>
                 <element signature="docComment;class#LivewireApp#0" expanded="false" />
                 <element signature="class#GradStruct#0;class#LivewireApp#0" expanded="false" />
@@ -123,15 +138,13 @@
       <file leaf-file-name="CostMap.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/CostMap.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="106" column="31" selection-start="3060" selection-end="3060" vertical-scroll-proportion="0.41935483" vertical-offset="1862" max-vertical-offset="3423">
+            <state line="143" column="51" selection-start="4473" selection-end="4473" vertical-scroll-proportion="0.2016129" vertical-offset="2828" max-vertical-offset="3759">
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2278#2284#0" expanded="true" />
-                <element signature="e#2345#2351#0" expanded="true" />
-                <element signature="e#2358#2610#0" expanded="true" />
-                <element signature="e#2599#2600#0" expanded="true" />
-                <element signature="e#3937#3943#0" expanded="true" />
-                <element signature="e#4669#4713#0" expanded="false" />
+                <element signature="e#2481#2487#0" expanded="true" />
+                <element signature="e#2548#2554#0" expanded="true" />
+                <element signature="e#4579#4585#0" expanded="true" />
+                <element signature="e#5339#5383#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -141,15 +154,6 @@
         <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_core.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="2091" column="24" selection-start="92321" selection-end="92321" vertical-scroll-proportion="0.0" vertical-offset="41232" max-vertical-offset="102816">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Cloneable.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files (x86)/Java/jdk1.7.0_51/src.zip!/java/lang/Cloneable.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="51" column="47" selection-start="1328" selection-end="1328" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="777">
               <folding />
             </state>
           </provider>
@@ -414,7 +418,7 @@
     <configuration default="false" name="Livewire" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="LivewireApp" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="res/mri_1.jpg" />
+      <option name="PROGRAM_PARAMETERS" value="res/mri_2.jpg" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -739,9 +743,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files (x86)/Java/jdk1.7.0_51/src.zip!/java/io/Serializable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="168" column="17" selection-start="7581" selection-end="7581" vertical-scroll-proportion="0.67058825" vertical-offset="2703" max-vertical-offset="3213">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_core.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2091" column="24" selection-start="92321" selection-end="92321" vertical-scroll-proportion="0.0" vertical-offset="41232" max-vertical-offset="102816">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/LivewireApp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="48" selection-start="2406" selection-end="2406" vertical-scroll-proportion="0.0" vertical-offset="224" max-vertical-offset="3297">
+        <state line="161" column="17" selection-start="6473" selection-end="6473" vertical-scroll-proportion="0.0" vertical-offset="2429" max-vertical-offset="3297">
           <folding>
             <element signature="docComment;class#LivewireApp#0" expanded="false" />
             <element signature="class#GradStruct#0;class#LivewireApp#0" expanded="false" />
@@ -758,24 +776,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/javacv/src/main/java/com/googlecode/javacv/cpp/opencv_core.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2091" column="24" selection-start="92321" selection-end="92321" vertical-scroll-proportion="0.0" vertical-offset="41232" max-vertical-offset="102816">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/CostMap.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="31" selection-start="3060" selection-end="3060" vertical-scroll-proportion="0.41935483" vertical-offset="1862" max-vertical-offset="3423">
+        <state line="143" column="51" selection-start="4473" selection-end="4473" vertical-scroll-proportion="0.2016129" vertical-offset="2828" max-vertical-offset="3759">
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2278#2284#0" expanded="true" />
-            <element signature="e#2345#2351#0" expanded="true" />
-            <element signature="e#2358#2610#0" expanded="true" />
-            <element signature="e#2599#2600#0" expanded="true" />
-            <element signature="e#3937#3943#0" expanded="true" />
-            <element signature="e#4669#4713#0" expanded="false" />
+            <element signature="e#2481#2487#0" expanded="true" />
+            <element signature="e#2548#2554#0" expanded="true" />
+            <element signature="e#4579#4585#0" expanded="true" />
+            <element signature="e#5339#5383#0" expanded="false" />
           </folding>
         </state>
       </provider>

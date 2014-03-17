@@ -2,6 +2,7 @@ import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_highgui;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -54,7 +55,7 @@ public class CostMap
             }
         }
 
-        reset();
+//        reset();
     }
 
     public void reset(){
@@ -74,35 +75,36 @@ public class CostMap
 
     public void addSeed(int row, int col){
         //TODO
+        reset();
         expand(row, col);
     }
 
     private void expand(int row, int col){
+        final String PROG_TITLE = "Expanding Graph...";
         CvMat expandImage = CvMat.create(
                 original.length, original[0].length, opencv_core.CV_8UC1, 1);
         opencv_core.cvSetZero(expandImage);
+        LivewireApp.showImage(PROG_TITLE, expandImage);
 
+        //create algorithm data structures
         Set<Node> closed = new HashSet<Node>();
-        PriorityQueue<Node> wavefront = new PriorityQueue<Node>(1000, new Comparator<Node>() {
-            @Override
-            public int compare(Node a, Node b)
-            {
-                if (a.cost > b.cost) return 1;
-                if (a.cost < b.cost) return -1;
-                return 0;
-            }
-        });
+        PriorityQueue<Node> wavefront = new PriorityQueue<Node>(1000, new NodeCompare());
 
-        wavefront.add(costs[row][col]);
+        //get seed point, initialize cost to 0, and add to wavefront
+        Node current = costs[row][col];
+        current.cost = 0;
+        wavefront.add(current);
 
         int count = 0;
         int step = (original.length * original[0].length)/100;
         System.out.println("Expanding graph...");
         while (!wavefront.isEmpty()){
-            Node current = wavefront.poll();
+            //get next lowest cost Node from wavefront and add to closed set
+            current = wavefront.poll();
             closed.add(current);
-            expandImage.put(current.row, current.col, 90);
+            expandImage.put(current.row, current.col, 50);
 
+            //get neighbors of current and expand
             ArrayList<Node> neigbors = getNeighbors(current);
             for (int i = 0; i < neigbors.size(); i++) {
                 Node n = neigbors.get(i);
@@ -114,18 +116,32 @@ public class CostMap
                     n.cost = tentativeCost;
                 }
 
+                //add neighbors to wavefront if not already in
                 if (!wavefront.contains(n)){
                     wavefront.add(n);
                     expandImage.put(n.row, n.col, 255);
                 }
             }
+
             if (count % step == 0){
-                opencv_highgui.cvShowImage("Graph Expansion", expandImage);
+                opencv_highgui.cvShowImage(PROG_TITLE, expandImage);
                 opencv_highgui.cvWaitKey(1);
             }
             count++;
         }
         System.out.println("Done");
+        opencv_highgui.cvShowImage(PROG_TITLE, expandImage);
+        opencv_highgui.cvWaitKey(1);
+    }
+
+    private class NodeCompare implements Comparator<Node>, Serializable{
+        @Override
+        public int compare(Node a, Node b)
+        {
+            if (a.cost > b.cost) return 1;
+            if (a.cost < b.cost) return -1;
+            return 0;
+        }
     }
 
     private ArrayList<Node> getNeighbors(Node n){
@@ -145,12 +161,12 @@ public class CostMap
         return neighbors;
     }
 
-    private int euclideanAdd(Node a, Node b){
+    private int euclideanAdd(Node current, Node n){
         //if diagonal, scale by RAD2
-        if (a.row != b.row && a.col != b.col)
-            return (int)(RAD2 * (a.cost + costs[b.row][b.col].cost));
+        if (current.row != n.row && current.col != n.col)
+            return current.cost + (int)(RAD2 * costs[n.row][n.col].cost);
 
-        return a.cost + costs[b.row][b.col].cost;
+        return current.cost + costs[n.row][n.col].cost;
     }
 
 //    private int toIndex(int row, int col){
