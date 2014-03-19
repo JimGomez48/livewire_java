@@ -8,6 +8,11 @@ out/*
 /.idea/
 /.idea/*
 
+doc/
+/doc/
+doc/*
+/doc*
+
 /out/production/livewire_java/*
 out/production/livewire_java/*
 

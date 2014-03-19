@@ -32,11 +32,18 @@ public class LivewireApp
     }
 
     public LivewireApp(String path) {
-        IplImage temp = opencv_highgui.cvLoadImageBGRA(path);
-        origImage = temp.asCvMat();
-        image = opencv_highgui.cvLoadImageM(path, opencv_core.CV_8U);
-        printMatType("image", image);
-        printMatType("orig", origImage);
+        try {
+            IplImage temp = opencv_highgui.cvLoadImageBGRA(path);
+            origImage = temp.asCvMat();
+            image = opencv_highgui.cvLoadImageM(path, opencv_core.CV_8U);
+            System.out.println("Loaded image \"" + path + "\" type:" +
+                    typeToString(origImage.type()));
+        }
+        catch (Exception e) {
+            System.out.println("ERROR: could not load file " + path);
+//            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     public void run() {
@@ -247,13 +254,12 @@ public class LivewireApp
                 case opencv_highgui.CV_EVENT_RBUTTONUP:
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
+                    System.out.println("Cleared current boundary");
                     opencv_core.cvZero(lines);
                     break;
                 case opencv_highgui.CV_EVENT_MOUSEMOVE:
                     if (seedset) {
                         currentPoint.put(x, y);
-                        System.out.println("Mouse move " + prevPoint + " to " +
-                                currentPoint);
                         opencv_core.cvDrawLine(lines, prevPoint, currentPoint,
                                 CvScalar.YELLOW, 1, 8, 0);
                         prevPoint.put(x, y);
@@ -268,7 +274,14 @@ public class LivewireApp
         }
     }
 
+    private static final String USAGE = "USAGE: <executable> <path to image file>";
+
     public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("No image data\n" + USAGE);
+            return;
+        }
+
         LivewireApp app = new LivewireApp(args[0]);
         app.run();
     }
