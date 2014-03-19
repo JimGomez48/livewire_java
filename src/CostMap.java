@@ -9,26 +9,19 @@ import java.util.*;
  */
 public class CostMap
 {
+    private static final float RAD2 = 1.41421356f;
+    Node[][] original;
+    Node[][] costs;
+    Node current;
+
     public class Node
     {
         public short row;
         public short col;
         public int cost;
         public Node parent;
-
-        public Node() {}
-
-        public Node(short row, short col, int cost, Node parent) {
-            this.row = row;
-            this.col = col;
-            this.cost = cost;
-            this.parent = parent;
-        }
     }
 
-    private static final float RAD2 = 1.41421356f;
-    Node[][] original;
-    Node[][] costs;
 
     public CostMap(CvMat image) {
         reset(image);
@@ -55,55 +48,59 @@ public class CostMap
         costs = Arrays.copyOf(original, original.length);
     }
 
-    private enum ExpandMethod
-    {
-        COST, DIST
-    }
+    private enum ExpandMethod { COST, DIST }
 
     public void addSeed(int row, int col) {
-        ExpandMethod method = ExpandMethod.COST;
-
         //TODO keep track of seed points
-
+        System.out.println("New seed-point row:" + row + " col:" + col);
         reset();
-        switch (method) {
-            case COST:
-                expandVcost(row, col);
-                break;
-            case DIST:
-                expandVdist(row, col);
-                break;
-            default:
-                expandVcost(row, col);
-        }
+        expand(row, col, ExpandMethod.COST);
     }
 
-    private void expandVdist(int row, int col) {
-        //TODO expand via nearest neighbor, not cost
-    }
-
-    private void expandVcost(int row, int col) {
-        final String PROG_TITLE = "Expanding Graph...";
+    private void expand(int row, int col, ExpandMethod method) {
+        final String EXPAND_TITLE = "Expanding Graph...";
         CvMat image = CvMat.create(
                 original.length, original[0].length, opencv_core.CV_8UC1, 1);
         opencv_core.cvSetZero(image);
-        LivewireApp.showImage(PROG_TITLE, image);
+        LivewireApp.showImage(EXPAND_TITLE, image);
 
         //create algorithm data structures COMPARE VIA CUM COST
         Set<Node> closed = new HashSet<Node>();
-        PriorityQueue<Node> wavefront = new PriorityQueue<Node>(1000,
-                new Comparator<Node>()
-        {
-            @Override
-            public int compare(Node a, Node b) {
-                if (a.cost > b.cost) return 1;
-                if (a.cost < b.cost) return -1;
-                return 0;
-            }
-        });
+        PriorityQueue<Node> wavefront;
+        //use specified comparator
+        switch (method) {
+            case COST:
+                wavefront = new PriorityQueue<Node>(1000, new Comparator<Node>()
+                {
+                    @Override
+                    public int compare(Node a, Node b) {
+                        if (a.cost > b.cost) return 1;
+                        if (a.cost < b.cost) return -1;
+                        return 0;
+                    }
+                });
+                break;
+            case DIST:
+                wavefront = new PriorityQueue<Node>(1000, new Comparator<Node>()
+                {
+                    @Override
+                    public int compare(Node a, Node b) {
+                        double distA = euclideanDist(current, a);
+                        double distB = euclideanDist(current, b);
+                        if (distA > distB)
+                            return 1;
+                        if (distA < distB) return -1;
+                        return 0;
+                    }
+                });
+                break;
+            default:
+                System.out.println("Invalid method argument for CostMap.expand()");
+                return;
+        }
 
         //get seed point, initialize cost to 0, and add to wavefront
-        Node current = costs[row][col];
+        current = costs[row][col];
         current.cost = 0;
         wavefront.add(current);
 
@@ -139,13 +136,13 @@ public class CostMap
             if (count % step == 0) {
                 System.out.println("Expanding:  " + (int) (100 * (count / size)) +
                         "%");
-                opencv_highgui.cvShowImage(PROG_TITLE, image);
+                opencv_highgui.cvShowImage(EXPAND_TITLE, image);
                 opencv_highgui.cvWaitKey(1);
             }
             count++;
         }
         System.out.println("Expanding: 100%\nDone");
-        opencv_highgui.cvShowImage(PROG_TITLE, image);
+        opencv_highgui.cvShowImage(EXPAND_TITLE, image);
         opencv_highgui.cvWaitKey(1);
     }
 
@@ -174,8 +171,8 @@ public class CostMap
         return current.cost + costs[n.row][n.col].cost;
     }
 
-    private int euclideanDist(Node a, Node b) {
-        return (int) Math.sqrt(((b.row - a.row) * (b.row - a.row)) +
+    private double euclideanDist(Node a, Node b) {
+        return (double) Math.sqrt(((b.row - a.row) * (b.row - a.row)) +
                 ((b.col - a.col) * (b.col - a.col)));
     }
 

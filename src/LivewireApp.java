@@ -1,5 +1,7 @@
 import com.googlecode.javacpp.Pointer;
 import com.googlecode.javacv.cpp.opencv_core;
+import com.googlecode.javacv.cpp.opencv_core.CvPoint;
+import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_highgui;
 import com.googlecode.javacv.cpp.opencv_imgproc;
@@ -36,35 +38,10 @@ public class LivewireApp
         CvMat edges = getEdges(image);
         CvMat sum = getWeightedSum(gradient, edges, 0.80f, 0.25f, 0.15f);
         costMap = new CostMap(sum);
-        showFeatures(gradient, edges, sum);
+//        showFeatures(gradient, edges, sum);
 
         showImage(APP_TITLE, image, 100, 100);
-        opencv_highgui.cvSetMouseCallback(APP_TITLE,
-                new opencv_highgui.CvMouseCallback()
-                {
-                    @Override
-                    public void call(int event, int x, int y, int flags,
-                                     Pointer param) {
-                        switch (event) {
-                            case opencv_highgui.CV_EVENT_LBUTTONDOWN:
-                                System.out.println("Left Down" + " row:" + y + " " +
-                                        "col:" + x);
-                                costMap.addSeed(y, x);
-                                break;
-                            case opencv_highgui.CV_EVENT_LBUTTONUP:
-                                break;
-                            case opencv_highgui.CV_EVENT_RBUTTONDOWN:
-                                break;
-                            case opencv_highgui.CV_EVENT_RBUTTONUP:
-                                break;
-                            case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
-                                break;
-                        }
-//                super.call(event, x, y, flags, param);
-                    }
-                }, null
-        );
-
+        opencv_highgui.cvSetMouseCallback(APP_TITLE, new MouseCallback(), null);
         opencv_highgui.cvWaitKey(0);
     }
 
@@ -215,6 +192,55 @@ public class LivewireApp
     private void printMatType(String name, CvMat m) {
         System.out.println(name + "->type: (" + m.type() + ") " +
                 typeToString(m.type()) + "C" + m.channels());
+    }
+
+    private class MouseCallback extends opencv_highgui.CvMouseCallback{
+        boolean seedset;
+        CvPoint prevPoint;
+        CvPoint currentPoint;
+
+        public MouseCallback(){
+            seedset = false;
+            prevPoint = new CvPoint();
+            currentPoint = new CvPoint();
+        }
+
+        @Override
+        public void call(int event, int x, int y, int flags,
+                         Pointer param) {
+            switch (event) {
+                case opencv_highgui.CV_EVENT_LBUTTONDOWN:
+                    costMap.addSeed(y, x);
+                    prevPoint.put(x, y);
+                    seedset = true;
+                    break;
+                case opencv_highgui.CV_EVENT_LBUTTONUP:
+                    break;
+                case opencv_highgui.CV_EVENT_RBUTTONDOWN:
+                    break;
+                case opencv_highgui.CV_EVENT_RBUTTONUP:
+                    break;
+                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
+                    seedset = false;
+                    break;
+                case opencv_highgui.CV_EVENT_MOUSEMOVE:
+                    if (seedset){
+                        currentPoint.put(x, y);
+                        System.out.println("Mouse move " + prevPoint + " to " + currentPoint);
+                        opencv_core.cvDrawLine(
+                                image,
+                                prevPoint,
+                                currentPoint,
+                                opencv_core.CV_RGB(1,0,0),
+                                3,
+                                8,
+                                0);
+                        prevPoint.put(x, y);
+                    }
+                    break;
+            }
+                //super.call(event, x, y, flags, param);
+        }
     }
 
     public static void main(String[] args) {
