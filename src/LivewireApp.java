@@ -3,6 +3,7 @@ import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvPoint;
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_highgui;
 import com.googlecode.javacv.cpp.opencv_imgproc;
 
@@ -18,6 +19,7 @@ import com.googlecode.javacv.cpp.opencv_imgproc;
 public class LivewireApp
 {
     private static final String APP_TITLE = "Live-Wire";
+    private CvMat origImage;
     private CvMat image;
     private CostMap costMap;
 
@@ -30,7 +32,11 @@ public class LivewireApp
     }
 
     public LivewireApp(String path) {
-        image = opencv_highgui.cvLoadImageM(path, opencv_core.CV_8UC1);
+        IplImage temp = opencv_highgui.cvLoadImageBGRA(path);
+        origImage = temp.asCvMat();
+        image = opencv_highgui.cvLoadImageM(path, opencv_core.CV_8U);
+        printMatType("image", image);
+        printMatType("orig", origImage);
     }
 
     public void run() {
@@ -40,7 +46,7 @@ public class LivewireApp
         costMap = new CostMap(sum);
 //        showFeatures(gradient, edges, sum);
 
-        showImage(APP_TITLE, image, 100, 100);
+        showImage(APP_TITLE, origImage, 100, 100);
         opencv_highgui.cvSetMouseCallback(APP_TITLE, new MouseCallback(), null);
         opencv_highgui.cvWaitKey(0);
     }
@@ -82,7 +88,7 @@ public class LivewireApp
         opencv_imgproc.Sobel(temp, gy, ddepth, 0, 1, 3,
                 scale, delta, opencv_imgproc.BORDER_DEFAULT);
 
-        //Scale Gx and Gy for viewing, and get Gradient Magnitude
+        //Scale and shift Gx and Gy values for viewing, and get Gradient Magnitude
         opencv_core.cvConvertScale(gx, gradient.x, 1.0 / 2.0, 128);
         opencv_core.cvConvertScale(gy, gradient.y, 1.0 / 2.0, 128);
         CvMat gxMag = CvMat.create(image.rows(), image.cols(), opencv_core.CV_8U, 1);
@@ -97,7 +103,6 @@ public class LivewireApp
             for (int j = 0; j < image.cols(); j++) {
                 float angle = (float) Math.toDegrees(Math.atan2(gy.get(i, j),
                         gx.get(i, j)));
-//                float angle = (float)Math.atan2(gy.get(i, j), gx.get(i, j));
                 dir.put(i, j, angle);
             }
         }
@@ -120,8 +125,9 @@ public class LivewireApp
         return edges;
     }
 
-    private CvMat getWeightedSum(GradStruct grad, CvMat edges, float wg, float wz,
-                                 float wd) {
+    private CvMat getWeightedSum(
+            GradStruct grad, CvMat edges, float wg, float wz, float wd)
+    {
         CvMat sum = CvMat.create(image.rows(), image.cols(), image.type(), 1);
         CvMat gradMag = CvMat.create(image.rows(), image.cols(),
                 opencv_core.CV_8U, 1);
@@ -151,29 +157,40 @@ public class LivewireApp
         opencv_highgui.cvShowImage(title, image);
     }
 
-    private void showFeatures(GradStruct gradient, CvMat edges, CvMat sum) {
+    private static final String GRAD_X_TITLE = "Gradient X-component";
+    private static final String GRAD_Y_TITLE = "Gradient Y-component";
+    private static final String GRAD_MAG_TITLE = "Gradient Magnitude";
+    private static final String GRAD_DIR_TITLE = "Gradient Direction";
+    private static final String EDGES_TITLE = "Canny Edges";
+    private static final String COST_MAP_TITLE = "Cost map (1 - weighted sum)";
 
+    private void showFeatures(GradStruct gradient, CvMat edges, CvMat sum) {
         if (gradient != null) {
             if (gradient.x != null)
-                showImage("Gradient x-component", gradient.x, 600, 100);
+                showImage(GRAD_X_TITLE, gradient.x, 600, 100);
             if (gradient.y != null)
-                showImage("Gradient y-component", gradient.y, 1100, 100);
+                showImage(GRAD_Y_TITLE, gradient.y, 1100, 100);
             if (gradient.mag != null)
-                showImage("Gradient Magnitude", gradient.mag, 100, 600);
+                showImage(GRAD_MAG_TITLE, gradient.mag, 100, 600);
             if (gradient.dir != null)
-                showImage("Gradient Direction", gradient.dir, 600, 600);
+                showImage(GRAD_DIR_TITLE, gradient.dir, 600, 600);
         }
 
         if (edges != null)
-            showImage("Canny Edges", edges, 1100, 600);
+            showImage(EDGES_TITLE, edges, 1100, 600);
         if (sum != null)
-            showImage("Inverted Sum (Cost Map)", sum, 800, 300);
+            showImage(COST_MAP_TITLE, sum, 800, 300);
+    }
+
+    private void printMatType(String name, CvMat m) {
+        System.out.println(name + "->type: (" + m.type() + ") " +
+                typeToString(m.type()));
     }
 
     private String typeToString(int type) {
         String r;
         int depth = type & opencv_core.CV_MAT_DEPTH_MASK;
-//        int chans = 1 + (type >> opencv_core.CV_CN_SHIFT);
+        int chans = 1 + (type >> opencv_core.CV_CN_SHIFT);
 
         switch (depth) {
             case opencv_core.CV_8U: r = "8U"; break;
@@ -186,23 +203,29 @@ public class LivewireApp
             default: r = "User"; break;
         }
 
-        return r;
+        return r + "C" + chans;
     }
 
-    private void printMatType(String name, CvMat m) {
-        System.out.println(name + "->type: (" + m.type() + ") " +
-                typeToString(m.type()) + "C" + m.channels());
-    }
-
-    private class MouseCallback extends opencv_highgui.CvMouseCallback{
+    private class MouseCallback extends opencv_highgui.CvMouseCallback
+    {
         boolean seedset;
         CvPoint prevPoint;
         CvPoint currentPoint;
+        CvMat lines;
+        CvMat liveImage;
 
-        public MouseCallback(){
+        public MouseCallback() {
             seedset = false;
             prevPoint = new CvPoint();
             currentPoint = new CvPoint();
+
+            lines = CvMat.create(origImage.rows(), origImage.cols(),
+                    origImage.type(), origImage.channels());
+            liveImage = CvMat.create(origImage.rows(), origImage.cols(),
+                    origImage.type(), origImage.channels());
+
+            opencv_core.cvZero(lines);
+            opencv_core.cvZero(liveImage);
         }
 
         @Override
@@ -216,30 +239,32 @@ public class LivewireApp
                     break;
                 case opencv_highgui.CV_EVENT_LBUTTONUP:
                     break;
+                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
+                    break;
                 case opencv_highgui.CV_EVENT_RBUTTONDOWN:
+                    seedset = false;
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONUP:
                     break;
-                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
-                    seedset = false;
+                case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
+                    opencv_core.cvZero(lines);
                     break;
                 case opencv_highgui.CV_EVENT_MOUSEMOVE:
-                    if (seedset){
+                    if (seedset) {
                         currentPoint.put(x, y);
-                        System.out.println("Mouse move " + prevPoint + " to " + currentPoint);
-                        opencv_core.cvDrawLine(
-                                image,
-                                prevPoint,
-                                currentPoint,
-                                opencv_core.CV_RGB(1,0,0),
-                                3,
-                                8,
-                                0);
+                        System.out.println("Mouse move " + prevPoint + " to " +
+                                currentPoint);
+                        opencv_core.cvDrawLine(lines, prevPoint, currentPoint,
+                                CvScalar.YELLOW, 1, 8, 0);
                         prevPoint.put(x, y);
                     }
                     break;
             }
-                //super.call(event, x, y, flags, param);
+            opencv_core.cvAdd(origImage, lines, liveImage, null);
+            opencv_highgui.cvShowImage(APP_TITLE, liveImage);
+            opencv_highgui.cvWaitKey(1);
+
+            //super.call(event, x, y, flags, param);
         }
     }
 
@@ -247,4 +272,5 @@ public class LivewireApp
         LivewireApp app = new LivewireApp(args[0]);
         app.run();
     }
+
 }
