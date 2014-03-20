@@ -1,3 +1,5 @@
+package livewire;
+
 import com.googlecode.javacpp.Pointer;
 import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvPoint;
@@ -215,15 +217,17 @@ public class LivewireApp
 
     private class MouseCallback extends opencv_highgui.CvMouseCallback
     {
-        boolean seedset;
-        CvPoint prevPoint;
-        CvPoint currentPoint;
-        CvMat lines;
-        CvMat liveImage;
+        private boolean seedset;
+
+        private CvPoint nextPoint;
+        private CvPoint currentPoint;
+        private CostMap.Node seedNode;
+        private CvMat lines;
+        private CvMat liveImage;
 
         public MouseCallback() {
             seedset = false;
-            prevPoint = new CvPoint();
+            nextPoint = new CvPoint();
             currentPoint = new CvPoint();
 
             lines = CvMat.create(origImage.rows(), origImage.cols(),
@@ -240,8 +244,9 @@ public class LivewireApp
                          Pointer param) {
             switch (event) {
                 case opencv_highgui.CV_EVENT_LBUTTONDOWN:
+                    seedNode = costMap.getNode(y, x);
                     costMap.addSeed(y, x);
-                    prevPoint.put(x, y);
+                    nextPoint.put(x, y);
                     seedset = true;
                     break;
                 case opencv_highgui.CV_EVENT_LBUTTONUP:
@@ -259,10 +264,18 @@ public class LivewireApp
                     break;
                 case opencv_highgui.CV_EVENT_MOUSEMOVE:
                     if (seedset) {
-                        currentPoint.put(x, y);
-                        opencv_core.cvDrawLine(lines, prevPoint, currentPoint,
-                                CvScalar.YELLOW, 1, 8, 0);
-                        prevPoint.put(x, y);
+                        opencv_core.cvZero(lines);
+                        CostMap.Node current = costMap.getNode(y, x);
+                        currentPoint.put(current.col, current.row);
+                        nextPoint.put(current.parent.col, current.parent.row);
+                        while (!current.equals(seedNode) || current == null){
+                            opencv_core.cvDrawLine(lines, currentPoint, nextPoint,
+                                    CvScalar.YELLOW, 1, 8, 0);
+                            current = current.parent;
+                            currentPoint.put(current.col, current.row);
+                            if (current.parent != null)
+                                nextPoint.put(current.parent.col, current.parent.row);
+                        }
                     }
                     break;
             }

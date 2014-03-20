@@ -1,3 +1,5 @@
+package livewire;
+
 import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_highgui;
@@ -20,6 +22,10 @@ public class CostMap
         public short col;
         public int cost;
         public Node parent;
+
+        public boolean equals(Node n) {
+            return n.row == this.row && n.col == this.col;
+        }
     }
 
 
@@ -41,7 +47,7 @@ public class CostMap
             }
         }
 
-//        reset();
+        reset();
     }
 
     public void reset() {
@@ -50,11 +56,17 @@ public class CostMap
 
     private enum ExpandMethod { COST, DIST }
 
-    public void addSeed(int row, int col) {
-        //TODO keep track of seed points
+    public Node addSeed(int row, int col) {
+        //TODO keep track of seed points for path cooling
         System.out.println("New seed-point row:" + row + " col:" + col);
         reset();
         expand(row, col, ExpandMethod.COST);
+
+        return costs[row][col];
+    }
+
+    public Node getNode(int row, int col){
+        return costs[row][col];
     }
 
     private void expand(int row, int col, ExpandMethod method) {
