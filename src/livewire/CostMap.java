@@ -70,11 +70,11 @@ public class CostMap
     }
 
     private void expand(int row, int col, ExpandMethod method) {
-        final String EXPAND_TITLE = "Expanding Graph...";
-        CvMat image = CvMat.create(
-                original.length, original[0].length, opencv_core.CV_8UC1, 1);
-        opencv_core.cvSetZero(image);
-        LivewireApp.showImage(EXPAND_TITLE, image);
+//        final String EXPAND_TITLE = "Expanding Graph...";
+//        CvMat image = CvMat.create(
+//                original.length, original[0].length, opencv_core.CV_8UC1, 1);
+//        opencv_core.cvSetZero(image);
+//        LivewireApp.showImage(EXPAND_TITLE, image);
 
         //create algorithm data structures COMPARE VIA CUM COST
         Set<Node> closed = new HashSet<Node>();
@@ -124,7 +124,7 @@ public class CostMap
             //get next lowest cost Node from wavefront and add to closed set
             current = wavefront.poll();
             closed.add(current);
-            image.put(current.row, current.col, 50);
+//            image.put(current.row, current.col, 50);
 
             //get neighbors of current and expandVcost
             ArrayList<Node> neigbors = getNeighbors(current);
@@ -141,21 +141,21 @@ public class CostMap
                 //add neighbors to wavefront if not already in
                 if (!wavefront.contains(n)) {
                     wavefront.add(n);
-                    image.put(n.row, n.col, 255);
+//                    image.put(n.row, n.col, 255);
                 }
             }
 
             if (count % step == 0) {
                 System.out.println("Expanding:  " + (int) (100 * (count / size)) +
                         "%");
-                opencv_highgui.cvShowImage(EXPAND_TITLE, image);
-                opencv_highgui.cvWaitKey(1);
+//                opencv_highgui.cvShowImage(EXPAND_TITLE, image);
+//                opencv_highgui.cvWaitKey(1);
             }
             count++;
         }
         System.out.println("Expanding: 100%\nDone");
-        opencv_highgui.cvShowImage(EXPAND_TITLE, image);
-        opencv_highgui.cvWaitKey(1);
+//        opencv_highgui.cvShowImage(EXPAND_TITLE, image);
+//        opencv_highgui.cvWaitKey(1);
     }
 
     private ArrayList<Node> getNeighbors(Node n) {

@@ -5,10 +5,21 @@ Professor Terzopoulos
 
 /************************************************************************************
 This implementation is based on the paper "Interactive live-wire boundary extraction"
-by William A. Barrett and Eric M. Mortensen.
+by William A. Barrett and Eric N. Mortensen.
 ************************************************************************************/
 
 
-INSTRUCTIONS FOR RUNNING PROGRAM
+PREFERRED PLATFORM/ENVIRONMENT
+==================================
+- Linux (this software was built and tested on Ubuntu 13.10 64-bit)
 
+
+REQUIREMENTS
+==================================
+- a working installation of OpenCV. Refer to <http://docs.opencv.org/doc/tutorials/introduction/table_of_content_introduction/table_of_content_introduction.html> for complete installation instructions.
+- a working installation of the java runtime environment, version 7 (jre7) or later.
+
+
+INSTRUCTIONS FOR RUNNING PROGRAM
+==================================
 - TODO

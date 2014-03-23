@@ -244,6 +244,7 @@ public class LivewireApp
                          Pointer param) {
             switch (event) {
                 case opencv_highgui.CV_EVENT_LBUTTONDOWN:
+                    seedset = false;
                     seedNode = costMap.getNode(y, x);
                     costMap.addSeed(y, x);
                     nextPoint.put(x, y);
@@ -259,6 +260,7 @@ public class LivewireApp
                 case opencv_highgui.CV_EVENT_RBUTTONUP:
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
+                    seedset = false;
                     System.out.println("Cleared current boundary");
                     opencv_core.cvZero(lines);
                     break;
@@ -268,7 +270,8 @@ public class LivewireApp
                         CostMap.Node current = costMap.getNode(y, x);
                         currentPoint.put(current.col, current.row);
                         nextPoint.put(current.parent.col, current.parent.row);
-                        while (!current.equals(seedNode) || current == null){
+                        while (!current.equals(seedNode) /*|| current == null*/){
+                            //TODO bug is in here!
                             opencv_core.cvDrawLine(lines, currentPoint, nextPoint,
                                     CvScalar.YELLOW, 1, 8, 0);
                             current = current.parent;
@@ -276,12 +279,13 @@ public class LivewireApp
                             if (current.parent != null)
                                 nextPoint.put(current.parent.col, current.parent.row);
                         }
+                        opencv_core.cvAdd(origImage, lines, liveImage, null);
+                        opencv_highgui.cvShowImage(APP_TITLE, liveImage);
+                        opencv_highgui.cvWaitKey(1);
                     }
                     break;
             }
-            opencv_core.cvAdd(origImage, lines, liveImage, null);
-            opencv_highgui.cvShowImage(APP_TITLE, liveImage);
-            opencv_highgui.cvWaitKey(1);
+
 
             //super.call(event, x, y, flags, param);
         }
