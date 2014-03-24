@@ -13,7 +13,7 @@ import com.googlecode.javacv.cpp.opencv_imgproc;
  * <p>An implementation of the "Live-Wire" image segmentation tool, also known as
  * "Intelligent Scissors".</p>
  *
- * <p>Based on the paper "Interactive live-wire boundary
+ * <p>Based on the paper "Interactive live-wire coolwire
  * extraction" by William A. Barrett and Eric N. Mortensen.</p>
  *
  * @author James Gomez
@@ -218,42 +218,47 @@ public class LivewireApp
     private class MouseCallback extends opencv_highgui.CvMouseCallback
     {
         private boolean seedset;
-
-        private CvPoint nextPoint;
         private CvPoint currentPoint;
+        private CvPoint nextPoint;
         private CostMap.Node seedNode;
-        private CvMat lines;
-        private CvMat liveImage;
+        private CvMat boundary;
+        private CvMat livewire;
+        private CvMat coolwire;
 
         public MouseCallback() {
             seedset = false;
-            nextPoint = new CvPoint();
+
             currentPoint = new CvPoint();
+            nextPoint = new CvPoint();
 
-            lines = CvMat.create(origImage.rows(), origImage.cols(),
+            boundary = CvMat.create(origImage.rows(), origImage.cols(),
                     origImage.type(), origImage.channels());
-            liveImage = CvMat.create(origImage.rows(), origImage.cols(),
+            livewire = CvMat.create(origImage.rows(), origImage.cols(),
+                    origImage.type(), origImage.channels());
+            coolwire = CvMat.create(origImage.rows(), origImage.cols(),
                     origImage.type(), origImage.channels());
 
-            opencv_core.cvZero(lines);
-            opencv_core.cvZero(liveImage);
+            opencv_core.cvZero(boundary);
+            opencv_core.cvZero(livewire);
+            opencv_core.cvZero(coolwire);
         }
 
         @Override
-        public void call(int event, int x, int y, int flags,
-                         Pointer param) {
+        public void call(int event, int x, int y, int flags, Pointer param) {
+            //TODO detect closed boundary!
             switch (event) {
                 case opencv_highgui.CV_EVENT_LBUTTONDOWN:
                     seedset = false;
-                    seedNode = costMap.getNode(y, x);
+                    opencv_core.cvAdd(livewire, coolwire, coolwire, null);
+                    opencv_core.cvZero(livewire);
                     costMap.addSeed(y, x);
-                    nextPoint.put(x, y);
+                    seedNode = costMap.getNode(y, x);
                     seedset = true;
                     break;
-                case opencv_highgui.CV_EVENT_LBUTTONUP:
-                    break;
-                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
-                    break;
+//                case opencv_highgui.CV_EVENT_LBUTTONUP:
+//                    break;
+//                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
+//                    break;
                 case opencv_highgui.CV_EVENT_RBUTTONDOWN:
                     seedset = false;
                     break;
@@ -262,32 +267,28 @@ public class LivewireApp
                 case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
                     seedset = false;
                     System.out.println("Cleared current boundary");
-                    opencv_core.cvZero(lines);
+                    opencv_core.cvZero(livewire);
+                    opencv_core.cvZero(coolwire);
                     break;
                 case opencv_highgui.CV_EVENT_MOUSEMOVE:
                     if (seedset) {
-                        opencv_core.cvZero(lines);
+                        opencv_core.cvZero(livewire);
                         CostMap.Node current = costMap.getNode(y, x);
-                        currentPoint.put(current.col, current.row);
-                        nextPoint.put(current.parent.col, current.parent.row);
-                        while (!current.equals(seedNode) /*|| current == null*/){
-                            //TODO bug is in here!
-                            opencv_core.cvDrawLine(lines, currentPoint, nextPoint,
+                        while (!current.equals(seedNode) && current.parent != null){
+                            currentPoint.put(current.col, current.row);
+                            nextPoint.put(current.parent.col, current.parent.row);
+                            opencv_core.cvDrawLine(livewire, currentPoint, nextPoint,
                                     CvScalar.YELLOW, 1, 8, 0);
                             current = current.parent;
-                            currentPoint.put(current.col, current.row);
-                            if (current.parent != null)
-                                nextPoint.put(current.parent.col, current.parent.row);
                         }
-                        opencv_core.cvAdd(origImage, lines, liveImage, null);
-                        opencv_highgui.cvShowImage(APP_TITLE, liveImage);
-                        opencv_highgui.cvWaitKey(1);
                     }
                     break;
             }
-
-
-            //super.call(event, x, y, flags, param);
+            opencv_core.cvZero(boundary);
+            opencv_core.cvAdd(coolwire, livewire, boundary, null);
+            opencv_core.cvAdd(origImage, boundary, boundary, null);
+            opencv_highgui.cvShowImage(APP_TITLE, boundary);
+            opencv_highgui.cvWaitKey(1);
         }
     }
 

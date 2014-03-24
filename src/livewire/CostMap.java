@@ -26,6 +26,16 @@ public class CostMap
         public boolean equals(Node n) {
             return n.row == this.row && n.col == this.col;
         }
+
+        @Override
+        public String toString() {
+            String parent = "set";
+            if (parent == null)
+                parent = "null";
+
+            return "Node[row:" +row + " col:" + col + " cost:" + cost +
+                    " parent:" + parent + "]";
+        }
     }
 
 
@@ -35,7 +45,9 @@ public class CostMap
 
     public void reset(CvMat image) {
         original = new Node[image.rows()][image.cols()];
+        costs = new Node[image.rows()][image.cols()];
 
+        //keep a copy of the original costs
         for (int i = 0; i < original.length; i++) {
             for (int j = 0; j < original[0].length; j++) {
                 Node n = new Node();
@@ -51,7 +63,17 @@ public class CostMap
     }
 
     public void reset() {
-        costs = Arrays.copyOf(original, original.length);
+        //make a deep copy of the original array of nodes
+        for (int i = 0; i < original.length; i++) {
+            for (int j = 0; j < original[0].length; j++) {
+                Node n = new Node();
+                n.row = original[i][j].row;
+                n.col = original[i][j].col;
+                n.cost = original[i][j].cost;
+                n.parent = null;
+                costs[i][j] = n;
+            }
+        }
     }
 
     private enum ExpandMethod { COST, DIST }
@@ -70,12 +92,6 @@ public class CostMap
     }
 
     private void expand(int row, int col, ExpandMethod method) {
-//        final String EXPAND_TITLE = "Expanding Graph...";
-//        CvMat image = CvMat.create(
-//                original.length, original[0].length, opencv_core.CV_8UC1, 1);
-//        opencv_core.cvSetZero(image);
-//        LivewireApp.showImage(EXPAND_TITLE, image);
-
         //create algorithm data structures COMPARE VIA CUM COST
         Set<Node> closed = new HashSet<Node>();
         PriorityQueue<Node> wavefront;
@@ -124,7 +140,6 @@ public class CostMap
             //get next lowest cost Node from wavefront and add to closed set
             current = wavefront.poll();
             closed.add(current);
-//            image.put(current.row, current.col, 50);
 
             //get neighbors of current and expandVcost
             ArrayList<Node> neigbors = getNeighbors(current);
@@ -141,21 +156,16 @@ public class CostMap
                 //add neighbors to wavefront if not already in
                 if (!wavefront.contains(n)) {
                     wavefront.add(n);
-//                    image.put(n.row, n.col, 255);
                 }
             }
 
             if (count % step == 0) {
                 System.out.println("Expanding:  " + (int) (100 * (count / size)) +
                         "%");
-//                opencv_highgui.cvShowImage(EXPAND_TITLE, image);
-//                opencv_highgui.cvWaitKey(1);
             }
             count++;
         }
-        System.out.println("Expanding: 100%\nDone");
-//        opencv_highgui.cvShowImage(EXPAND_TITLE, image);
-//        opencv_highgui.cvWaitKey(1);
+        System.out.println("Expanding: 100%");
     }
 
     private ArrayList<Node> getNeighbors(Node n) {
