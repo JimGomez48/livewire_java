@@ -35,16 +35,7 @@ public class CostMap
         /** the next node along the lowest cost path from this node to the seed */
         public Node parent;
 
-        @Override
-        public boolean equals(Object o)
-        {
-            if (o == null || !(o instanceof Node))
-                return false;
-            if (o == this)
-                return true;
-
-            Node n = (Node) o;
-
+        public boolean equals(Node n) {
             return n.row == this.row && n.col == this.col;
         }
 
