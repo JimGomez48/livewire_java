@@ -21,15 +21,26 @@ import com.googlecode.javacv.cpp.opencv_imgproc;
 public class LivewireApp
 {
     private static final String APP_TITLE = "Live-Wire";
+    /** Stores an unaltered copy of the original user specified image */
     private CvMat origImage;
+    /** A grayscale copy of the origImage for manipulation and feature extraction */
     private CvMat image;
+    /** Used for generating and storing least cost boundaries within the image */
     private CostMap costMap;
 
+    /**
+     * A structure used to store the gradient x and y components, gradient magnitude,
+     * and gradient direction features of an image.
+     */
     private class GradStruct
     {
+        /** The x-component of the image gradient */
         public CvMat x;
+        /** The y-component of the image gradient */
         public CvMat y;
+        /** The gradient magnitude of the image */
         public CvMat mag;
+        /** The gradient direction of the image */
         public CvMat dir;
     }
 
@@ -43,15 +54,18 @@ public class LivewireApp
         }
         catch (Exception e) {
             System.out.println("ERROR: could not load file " + path);
-//            e.printStackTrace();
             System.exit(1);
         }
     }
 
+    /**
+     * Initializes application classes and structures and creates the application
+     * GUI
+     */
     public void run() {
         GradStruct gradient = getGradient(image);
         CvMat edges = getEdges(image);
-        CvMat sum = getWeightedSum(gradient, edges, 0.80f, 0.25f, 0.15f);
+        CvMat sum = getInverseWeightedSum(gradient, edges, 0.80f, 0.25f, 0.15f);
         costMap = new CostMap(sum);
 //        showFeatures(gradient, edges, sum);
 
@@ -60,6 +74,13 @@ public class LivewireApp
         opencv_highgui.cvWaitKey(0);
     }
 
+    /**
+     * Exracts the gradient x and y components, gradient magnitude, and gradient
+     * direction features from the specified image.
+     *
+     * @return a structure containing the gradient x and y components, gradient
+     * magnitude, and gradient direction
+     */
     private GradStruct getGradient(CvMat image) {
         //Istantiate Gradient Mats
         GradStruct gradient = new GradStruct();
@@ -120,6 +141,12 @@ public class LivewireApp
         return gradient;
     }
 
+    /**
+     * Uses the OpenCv Canny Edge detector to extractor the edge features from the
+     * image
+     *
+     * @return the edge features of the image
+     */
     private CvMat getEdges(CvMat image) {
         CvMat edges = CvMat.create(image.rows(), image.cols(), opencv_core.CV_8U, 1);
         edges.put(image);
@@ -134,7 +161,18 @@ public class LivewireApp
         return edges;
     }
 
-    private CvMat getWeightedSum(
+    /**
+     * Calculates the inverse of the weighted sum of the gradient and edge features.
+     *
+     * @param grad  a structure containing the gradient x and y components, the
+     *              gradient magnitude, and the gradient direction features
+     * @param edges the edge features
+     * @param wg    the weight to apply to the gradient magnitude feature
+     * @param wz    the weight to apply to the edge feature
+     * @param wd    the weight to apply to the gradient direction feature
+     * @return the inverse-weighted-sum of the features
+     */
+    private CvMat getInverseWeightedSum(
             GradStruct grad, CvMat edges, float wg, float wz, float wd)
     {
         CvMat sum = CvMat.create(image.rows(), image.cols(), image.type(), 1);
@@ -155,11 +193,19 @@ public class LivewireApp
         return sum;
     }
 
+    /**
+     * Creates a named window at an unspecified location and shows the CvMat as an
+     * image within that named window
+     */
     public static void showImage(String title, CvMat image) {
         opencv_highgui.cvNamedWindow(title);
         opencv_highgui.cvShowImage(title, image);
     }
 
+    /**
+     * Creates a named window at the specified point and shows the CvMat as an image
+     * within that named window
+     */
     public static void showImage(String title, CvMat image, int x, int y) {
         opencv_highgui.cvNamedWindow(title);
         opencv_highgui.cvMoveWindow(title, x, y);
@@ -173,6 +219,10 @@ public class LivewireApp
     private static final String EDGES_TITLE = "Canny Edges";
     private static final String COST_MAP_TITLE = "Cost map (1 - weighted sum)";
 
+    /**
+     * Shows the Gradient, edge, and weighted sum features extracted from the
+     * original image, if available.
+     */
     private void showFeatures(GradStruct gradient, CvMat edges, CvMat sum) {
         if (gradient != null) {
             if (gradient.x != null)
@@ -191,11 +241,13 @@ public class LivewireApp
             showImage(COST_MAP_TITLE, sum, 800, 300);
     }
 
+    /** Prints the Mat pixel type of the given CvMat to standard out */
     private void printMatType(String name, CvMat m) {
         System.out.println(name + "->type: (" + m.type() + ") " +
                 typeToString(m.type()));
     }
 
+    /** Converts the numerical type code to a human-readable string */
     private String typeToString(int type) {
         String r;
         int depth = type & opencv_core.CV_MAT_DEPTH_MASK;
@@ -215,6 +267,10 @@ public class LivewireApp
         return r + "C" + chans;
     }
 
+    /**
+     * An implementation of the CvMouseCallback for capturing mouse events within the
+     * Livewire application
+     */
     private class MouseCallback extends opencv_highgui.CvMouseCallback
     {
         private boolean seedset;
@@ -243,6 +299,16 @@ public class LivewireApp
             opencv_core.cvZero(coolwire);
         }
 
+        /**
+         * This method is called when mouse events are triggered on the corresponding
+         * GUI
+         *
+         * @param event specifies the type of mouse event that occured
+         * @param x     the x position of the mouse when this event was captured
+         * @param y     the y position of the mouse when this event was captured
+         * @param flags ?
+         * @param param ?
+         */
         @Override
         public void call(int event, int x, int y, int flags, Pointer param) {
             //TODO detect closed boundary!
@@ -294,6 +360,7 @@ public class LivewireApp
 
     private static final String USAGE = "USAGE: <executable> <path to image file>";
 
+    /** The application's entry point */
     public static void main(String[] args) {
         if (args.length < 1) {
             System.out.println("No image data\n" + USAGE);
