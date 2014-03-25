@@ -164,7 +164,8 @@ public class CostMap
      */
     private void expand(int row, int col) {
         //create algorithm data structures COMPARE VIA CUM COST
-        Set<Node> closed = new HashSet<Node>();
+        Set<Node> closed = new HashSet<Node>(1000);
+        Set<Node> open = new HashSet<Node>(1000);
         PriorityQueue<Node> wavefront =
                 new PriorityQueue<Node>(2000, new Comparator<Node>()
                 {
@@ -179,6 +180,7 @@ public class CostMap
         Node current = costs[row][col];
         current.cost = 0;
         wavefront.add(current);
+        open.add(current);
 
         int count = 0;
         float size = (float) original.length * original[0].length;
@@ -187,6 +189,7 @@ public class CostMap
         while (!wavefront.isEmpty()) {
             //get next lowest cost Node from wavefront and add to closed set
             current = wavefront.poll();
+            open.remove(current);
             closed.add(current);
 
             //get neighbors of current and expandVcost
@@ -202,8 +205,9 @@ public class CostMap
                 }
 
                 //add neighbors to wavefront if not already in
-                if (!wavefront.contains(n)) {
+                if (!open.contains(n)) {
                     wavefront.add(n);
+                    open.add(n);
                 }
             }
 
