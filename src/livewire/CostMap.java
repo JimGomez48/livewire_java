@@ -19,7 +19,7 @@ public class CostMap
     private static final float RAD2 = 1.41421356f;
     Node[][] original;
     Node[][] costs;
-    Node current;
+    Node lastSeed;
 
     /**
      * Used for the expansion algorithm to store cumulative costs and parent
@@ -105,11 +105,6 @@ public class CostMap
         }
     }
 
-    private enum ExpandMethod
-    {
-        COST, DIST
-    }
-
     /**
      * Sets a seedpoint as the starting point of the expansion algorithm. A call to
      * this method triggers the expansion algorithm to run, generating cumulative
@@ -131,8 +126,9 @@ public class CostMap
      */
     public void addSeed(int row, int col) {
         System.out.println("New seed-point row:" + row + " col:" + col);
+        lastSeed = costs[row][col];
         reset();
-        expand(row, col, ExpandMethod.COST);
+        expand(row, col);
     }
 
     /**
@@ -164,18 +160,41 @@ public class CostMap
         return getNode(best.row, best.col);
     }
 
+    public Node getClosestEdge(int row, int col){
+        Node n = costs[row][col];
+        int count = 0;
+        while (!n.equals(lastSeed) && n.parent != null){
+            if (original[n.row][n.col].cost <= 0)
+                return n;
+            if (++count >= 30) break; //if too far away
+            n = n.parent;
+        }
+
+        n = costs[row][col];
+        Node best = n;
+        ArrayList<Node> neighbors = getNeighbors(n, 6);
+        while (!n.equals(lastSeed) && n.parent != null){
+            if (neighbors.contains(n) &&
+                    original[n.row][n.col].cost < original[best.row][best.col].cost){
+                best = n;
+            }
+            if (original[best.row][best.col].cost <= 5) return best;
+
+            n = n.parent;
+        }
+
+        return best;
+    }
+
     /**
      * Generates cumulative costs and parent pointers using a variation of Dijkstra's
      * shortest path algorithm. The resultant min-cost tree is stored in a 2-D array
      */
-    private void expand(int row, int col, ExpandMethod method) {
+    private void expand(int row, int col) {
         //create algorithm data structures COMPARE VIA CUM COST
         Set<Node> closed = new HashSet<Node>();
-        PriorityQueue<Node> wavefront;
-        //use specified comparator
-        switch (method) {
-            case COST:
-                wavefront = new PriorityQueue<Node>(1000, new Comparator<Node>()
+        PriorityQueue<Node> wavefront =
+                new PriorityQueue<Node>(2000, new Comparator<Node>()
                 {
                     @Override
                     public int compare(Node a, Node b) {
@@ -184,28 +203,8 @@ public class CostMap
                         return 0;
                     }
                 });
-                break;
-            case DIST:
-                wavefront = new PriorityQueue<Node>(1000, new Comparator<Node>()
-                {
-                    @Override
-                    public int compare(Node a, Node b) {
-                        double distA = euclideanDist(current, a);
-                        double distB = euclideanDist(current, b);
-                        if (distA > distB)
-                            return 1;
-                        if (distA < distB) return -1;
-                        return 0;
-                    }
-                });
-                break;
-            default:
-                System.err.println("Invalid method argument for CostMap.expand()");
-                return;
-        }
 
-        //get seed point, initialize cost to 0, and add to wavefront
-        current = costs[row][col];
+        Node current = costs[row][col];
         current.cost = 0;
         wavefront.add(current);
 
@@ -219,7 +218,7 @@ public class CostMap
             closed.add(current);
 
             //get neighbors of current and expandVcost
-            List<Node> neigbors = getNeighbors(current);
+            List<Node> neigbors = getNeighbors(current, 1);
             for (int i = 0; i < neigbors.size(); i++) {
                 Node n = neigbors.get(i);
                 if (closed.contains(n)) continue;
@@ -248,11 +247,11 @@ public class CostMap
     /**
      * @return a list of n's neighbor Nodes
      */
-    private ArrayList<Node> getNeighbors(Node n) {
+    private ArrayList<Node> getNeighbors(Node n, int distance) {
         ArrayList<Node> neighbors = new ArrayList<Node>(8);
 
-        for (int i = n.row - 1; i <= n.row + 1; i++) {
-            for (int j = n.col - 1; j <= n.col + 1; j++) {
+        for (int i = n.row - distance; i <= n.row + distance; i++) {
+            for (int j = n.col - distance; j <= n.col + distance; j++) {
                 //skip node n
                 if (i == n.row && j == n.col) continue;
                 //check if current neighbor is within image bounds

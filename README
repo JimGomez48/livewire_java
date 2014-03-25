@@ -22,4 +22,8 @@ REQUIREMENTS
 
 INSTRUCTIONS FOR RUNNING PROGRAM
 ==================================
-- TODO
+- unzip the project
+- ensure the res folder and the livewire.jar file are in the same directory
+- in a terminal(or command prompt) type "java -jar livewire_java.jar <path to image file>"
+
+//TODO specific in-app user instructions

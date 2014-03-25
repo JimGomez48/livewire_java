@@ -11,6 +11,7 @@ import com.googlecode.javacv.cpp.opencv_imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -314,31 +315,24 @@ public class LivewireApp
          */
         @Override
         public void call(int event, int x, int y, int flags, Pointer param) {
-            //TODO detect closed boundary!
             switch (event) {
                 case opencv_highgui.CV_EVENT_LBUTTONDOWN:
-                    if (seedset && seedNode != null) {
-                        livewire.put(coolwire);
-                        drawWire(livewire, costMap.getNode(y, x), seedNode,
-                                CvScalar.BLUE, true);
+                    if (!seedset || seedNode == null) {
+                        seedNode = costMap.snapToEdge(y, x, 7);
+                        costMap.addSeed(seedNode.row, seedNode.col);
+                        seedset = true;
                     }
-                    seedset = false;
-                    coolwire.put(livewire);
-                    seedNode = costMap.snapToEdge(y, x, 5);
-                    costMap.addSeed(seedNode.row, seedNode.col);
-//                    seedNode = costMap.getNode(y, x);
-//                    boundary.add(seedNode);
-                    seedset = true;
-                    System.out.println(boundary);
+                    else{
+                        CostMap.Node current = costMap.getClosestEdge(y, x);
+                        boolean closed = coolBoundary(current, seedNode);
+                        seedNode = current;
+                        costMap.addSeed(seedNode.row, seedNode.col);
+                        if (closed)
+                            System.out.println("CLOSED");
+                    }
                     break;
-//                case opencv_highgui.CV_EVENT_LBUTTONUP:
-//                    break;
-//                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
-//                    break;
                 case opencv_highgui.CV_EVENT_RBUTTONDOWN:
                     seedset = false;
-                    break;
-                case opencv_highgui.CV_EVENT_RBUTTONUP:
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
                     seedset = false;
@@ -349,39 +343,74 @@ public class LivewireApp
                     break;
                 case opencv_highgui.CV_EVENT_MOUSEMOVE:
                     if (seedset) {
-                        livewire.put(coolwire);
-                        drawWire(livewire, costMap.getNode(y, x), seedNode,
-                                CvScalar.RED, false);
+//                        drawWire(costMap.getNode(y, x), seedNode);
                     }
                     break;
             }
+            if (seedset) drawWire(costMap.getNode(y, x), seedNode);
             opencv_highgui.cvShowImage(APP_TITLE, livewire);
             opencv_highgui.cvWaitKey(1);
         }
 
         /**
-         * Draws the livewire boundary onto the specified image
+         * Cools a portion of the boundary. That portion will no longer be subject to
+         * change as the mouse cursor moves
          *
-         * @param image the image to draw the wire onto
-         * @param start the start Node to draw the boundary from
-         * @param end   the end Node to draw the boundary to
-         * @param color the color the draw the boundary as
+         * @param current the start Node to cool the boundary from
+         * @param lastseed the last seedpoint to cool the boundary to.
          */
-        private void drawWire(CvMat image, CostMap.Node start, CostMap.Node end,
-                              CvScalar color, boolean addToBoundary) {
-            ArrayList<CostMap.Node> buffer = new ArrayList<CostMap.Node>(1000);
-            CostMap.Node current = start;
-            while (!current.equals(end) && current.parent != null) {
+        private boolean coolBoundary(CostMap.Node current, CostMap.Node lastseed){
+            ArrayList<CostMap.Node> buffer = new ArrayList<CostMap.Node>();
+            while (!current.equals(lastseed) && current.parent != null){
                 currentPoint.put(current.col, current.row);
                 nextPoint.put(current.parent.col, current.parent.row);
-                opencv_core.cvDrawLine(livewire, currentPoint, nextPoint,
-                        color, 1, 8, 0);
-                if (addToBoundary)
-                    buffer.add(current);
+                opencv_core.cvDrawLine(coolwire, currentPoint, nextPoint,
+                        CvScalar.BLUE, 1, 8, 0);
+
+                if (!boundary.isEmpty() && boundary.get(0).equals(current))
+                    return true;
+
+                buffer.add(current);
                 current = current.parent;
             }
             Collections.reverse(buffer);
             boundary.addAll(buffer);
+
+            return false;
+        }
+
+        /**
+         * Draws the livewire boundary onto the livewire image
+         *
+         * @param start the start Node to draw the boundary from
+         * @param end   the end Node to draw the boundary to
+         */
+        private void drawWire(CostMap.Node start, CostMap.Node end) {
+            livewire.put(coolwire);
+            while (!start.equals(end) && start.parent != null) {
+                currentPoint.put(start.col, start.row);
+                nextPoint.put(start.parent.col, start.parent.row);
+                opencv_core.cvDrawLine(livewire, currentPoint, nextPoint,
+                        CvScalar.RED, 1, 8, 0);
+                start = start.parent;
+            }
+        }
+
+        private boolean isBoundaryClosed(){
+            boolean closed = false;
+            CostMap.Node seed = boundary.get(0);
+            int count = 0;
+
+            for (int i = boundary.size() - 1; i >= 1; i--) {
+                CostMap.Node n = boundary.get(i);
+                if (n.equals(seed)) {
+                    closed = true;
+                }
+                //only check the end 20% of the boundary
+                if (count >= 0.2*boundary.size()) break;
+            }
+
+            return closed;
         }
 
     }
