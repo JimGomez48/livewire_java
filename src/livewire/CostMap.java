@@ -149,6 +149,21 @@ public class CostMap
         return costs[row][col];
     }
 
+    public Node snapToEdge(int row, int col, int dist){
+        Node current = original[row][col];
+        Node best = current;
+
+        for (int i = row - dist; i < row + dist; i++) {
+            for (int j = col - dist; j < col + dist; j++) {
+                current = original[i][j];
+                if (current.cost < best.cost)
+                    best = current;
+            }
+        }
+
+        return getNode(best.row, best.col);
+    }
+
     /**
      * Generates cumulative costs and parent pointers using a variation of Dijkstra's
      * shortest path algorithm. The resultant min-cost tree is stored in a 2-D array

@@ -324,8 +324,9 @@ public class LivewireApp
                     }
                     seedset = false;
                     coolwire.put(livewire);
-                    costMap.addSeed(y, x);
-                    seedNode = costMap.getNode(y, x);
+                    seedNode = costMap.snapToEdge(y, x, 5);
+                    costMap.addSeed(seedNode.row, seedNode.col);
+//                    seedNode = costMap.getNode(y, x);
 //                    boundary.add(seedNode);
                     seedset = true;
                     System.out.println(boundary);
