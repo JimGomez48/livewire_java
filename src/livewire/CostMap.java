@@ -96,17 +96,6 @@ public class CostMap
      * this method triggers the expansion algorithm to run, generating cumulative
      * costs and parents pointers.
      *
-     * @param seed the starting seedpoint
-     */
-    public void addSeed(CvPoint seed) {
-        addSeed(seed.y(), seed.x());
-    }
-
-    /**
-     * Sets a seedpoint as the starting point of the expansion algorithm. A call to
-     * this method triggers the expansion algorithm to run, generating cumulative
-     * costs and parents pointers.
-     *
      * @param row the pixel row of the starting seedpoint
      * @param col the column of the starting seedpoint
      */
@@ -252,12 +241,6 @@ public class CostMap
             return current.cost + (int) (RAD2 * costs[n.row][n.col].cost);
 
         return current.cost + costs[n.row][n.col].cost;
-    }
-
-    /** @return the euclidean distance between Node a and Node b */
-    private double euclideanDist(Node a, Node b) {
-        return (double) Math.sqrt(((b.row - a.row) * (b.row - a.row)) +
-                ((b.col - a.col) * (b.col - a.col)));
     }
 
 }
