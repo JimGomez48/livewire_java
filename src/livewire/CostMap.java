@@ -27,21 +27,13 @@ public class CostMap
      */
     public class Node
     {
-        /**
-         * the row of the pixel that this node corresponds to
-         */
+        /** the row of the pixel that this node corresponds to */
         public short row;
-        /**
-         * the column of the pixel that this node corresponds to
-         */
+        /** the column of the pixel that this node corresponds to */
         public short col;
-        /**
-         * the current cumulative cost of this node from the seed point
-         */
+        /** the current cumulative cost of this node from the seed point */
         public int cost;
-        /**
-         * the next node along the lowest cost path from this node to the seed
-         */
+        /** the next node along the lowest cost path from this node to the seed */
         public Node parent;
 
         public boolean equals(Node n) {
@@ -59,16 +51,12 @@ public class CostMap
         }
     }
 
-    /**
-     * Creates a CostMap with the given CvMat image as its starting data
-     */
+    /** Creates a CostMap with the given CvMat image as its starting data */
     public CostMap(CvMat image) {
         reset(image);
     }
 
-    /**
-     * Resets the algorithm to a non-expanded state using a new image
-     */
+    /** Resets the algorithm to a non-expanded state using a new image */
     public void reset(CvMat image) {
         original = new Node[image.rows()][image.cols()];
         costs = new Node[image.rows()][image.cols()];
@@ -88,9 +76,7 @@ public class CostMap
         reset();
     }
 
-    /**
-     * Resets the algorithm to the original, non-expanded state.
-     */
+    /** Resets the algorithm to the original, non-expanded state. */
     public void reset() {
         //make a deep copy of the original array of nodes
         for (int i = 0; i < original.length; i++) {
@@ -131,21 +117,17 @@ public class CostMap
         expand(row, col);
     }
 
-    /**
-     * @return the Node corresponding to the specified point in the image
-     */
+    /** @return the Node corresponding to the specified point in the image */
     public Node getNode(CvPoint point) {
         return getNode(point.y(), point.x());
     }
 
-    /**
-     * @return the Node corresponding to the specified point in the image
-     */
+    /** @return the Node corresponding to the specified point in the image */
     public Node getNode(int row, int col) {
         return costs[row][col];
     }
 
-    public Node snapToEdge(int row, int col, int dist){
+    public Node snapToEdge(int row, int col, int dist) {
         Node current = original[row][col];
         Node best = current;
 
@@ -160,10 +142,10 @@ public class CostMap
         return getNode(best.row, best.col);
     }
 
-    public Node getClosestEdge(int row, int col){
+    public Node getClosestEdge(int row, int col) {
         Node n = costs[row][col];
         int count = 0;
-        while (!n.equals(lastSeed) && n.parent != null){
+        while (!n.equals(lastSeed) && n.parent != null) {
             if (original[n.row][n.col].cost <= 0)
                 return n;
             if (++count >= 30) break; //if too far away
@@ -173,9 +155,10 @@ public class CostMap
         n = costs[row][col];
         Node best = n;
         ArrayList<Node> neighbors = getNeighbors(n, 6);
-        while (!n.equals(lastSeed) && n.parent != null){
+        while (!n.equals(lastSeed) && n.parent != null) {
             if (neighbors.contains(n) &&
-                    original[n.row][n.col].cost < original[best.row][best.col].cost){
+                    original[n.row][n.col].cost < original[best.row][best.col]
+                            .cost) {
                 best = n;
             }
             if (original[best.row][best.col].cost <= 5) return best;
@@ -244,9 +227,7 @@ public class CostMap
         System.out.println("Expanding: 100%");
     }
 
-    /**
-     * @return a list of n's neighbor Nodes
-     */
+    /** @return a list of n's neighbor Nodes */
     private ArrayList<Node> getNeighbors(Node n, int distance) {
         ArrayList<Node> neighbors = new ArrayList<Node>(8);
 
@@ -264,9 +245,7 @@ public class CostMap
         return neighbors;
     }
 
-    /**
-     * @return the euclidean-scaled cumulative cost from Node current to Node n
-     */
+    /** @return the euclidean-scaled cumulative cost from Node current to Node n */
     private int euclideanAdd(Node current, Node n) {
         //if diagonal, scale by RAD2
         if (current.row != n.row && current.col != n.col)
@@ -275,9 +254,7 @@ public class CostMap
         return current.cost + costs[n.row][n.col].cost;
     }
 
-    /**
-     * @return the euclidean distance between Node a and Node b
-     */
+    /** @return the euclidean distance between Node a and Node b */
     private double euclideanDist(Node a, Node b) {
         return (double) Math.sqrt(((b.row - a.row) * (b.row - a.row)) +
                 ((b.col - a.col) * (b.col - a.col)));
