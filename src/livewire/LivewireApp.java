@@ -2,16 +2,15 @@ package livewire;
 
 import com.googlecode.javacpp.Pointer;
 import com.googlecode.javacv.cpp.opencv_core;
+import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_core.CvPoint;
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
-import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_highgui;
 import com.googlecode.javacv.cpp.opencv_imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -360,15 +359,18 @@ public class LivewireApp
          * @param lastseed the last seedpoint to cool the boundary to.
          */
         private boolean coolBoundary(CostMap.Node current, CostMap.Node lastseed){
+            boolean closed = false;
             ArrayList<CostMap.Node> buffer = new ArrayList<CostMap.Node>();
             while (!current.equals(lastseed) && current.parent != null){
                 currentPoint.put(current.col, current.row);
                 nextPoint.put(current.parent.col, current.parent.row);
                 opencv_core.cvDrawLine(coolwire, currentPoint, nextPoint,
-                        CvScalar.BLUE, 1, 8, 0);
+                        CvScalar.YELLOW, 1, 8, 0);
 
-                if (!boundary.isEmpty() && boundary.get(0).equals(current))
-                    return true;
+                if (!boundary.isEmpty() && boundary.get(0).equals(current)) {
+                    closed = true;
+//                    break;
+                }
 
                 buffer.add(current);
                 current = current.parent;
@@ -376,7 +378,7 @@ public class LivewireApp
             Collections.reverse(buffer);
             boundary.addAll(buffer);
 
-            return false;
+            return closed;
         }
 
         /**
