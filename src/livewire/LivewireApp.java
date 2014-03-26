@@ -448,7 +448,22 @@ public class LivewireApp
         }
 
         LivewireApp app = new LivewireApp(args[0]);
+        printInstructions();
         app.run();
+    }
+
+    private static void printInstructions(){
+        System.out.println("\nINSTRUCTIONS");
+        System.out.println("======================");
+        System.out.println("- Click near an edge to generate a seed point");
+        System.out.println("- Drag the cursor around to adjust boundary free end");
+        System.out.println("- To cool current boundary, left-click near a desired edge");
+        System.out.println("- To clear current boundary, double-click right mouse button");
+        System.out.println("- To close off boundary, overlap free end with current boundary tail.");
+        System.out.println("  The app will detect boundary closure and stop tracing.");
+        System.out.println("- Press enter to display the current boundary, or double-click");
+        System.out.println("  the right mouse button to clear the current boundary");
+        System.out.println();
     }
 
 }
