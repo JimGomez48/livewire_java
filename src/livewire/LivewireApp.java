@@ -29,8 +29,7 @@ import java.util.List;
  */
 public class LivewireApp
 {
-    private static final String APP_TITLE = "Live-Wire";
-    private static final String SEGMENT_TITLE = "Extracted Segment";
+    private static final String APP_TITLE = "Live-Wire App";
     /** Stores an unaltered copy of the original user specified image */
     private CvMat origImage;
     /** A grayscale copy of the origImage for manipulation and feature extraction */
@@ -332,7 +331,7 @@ public class LivewireApp
                         if (coolBoundary(current, seedNode)){
                             seedset = false;
                             drawCoolWire();
-                            showSegment();
+                            extractSegment();
                         }
                         else{
                             drawCoolWire();
@@ -347,16 +346,17 @@ public class LivewireApp
                 case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
                     seedset = false;
                     System.out.println("Boundary cleared");
+                    opencv_highgui.cvDestroyWindow(BOUNDARY_TITLE);
                     opencv_highgui.cvDestroyWindow(SEGMENT_TITLE);
                     livewire.put(origImage);
                     coolwire.put(origImage);
                     boundary.clear();
                     break;
-                case opencv_highgui.CV_EVENT_MOUSEMOVE:
-                    if (seedset) {
+//                case opencv_highgui.CV_EVENT_MOUSEMOVE:
+//                    if (seedset) {
 //                        drawLiveWire(costMap.getNode(y, x), seedNode);
-                    }
-                    break;
+//                    }
+//                    break;
             }
             if (seedset) drawLiveWire(costMap.getNode(y, x), seedNode);
             opencv_highgui.cvShowImage(APP_TITLE, livewire);
@@ -423,7 +423,7 @@ public class LivewireApp
                 n = boundary.get(i + 1);
                 nextPoint.put(n.col, n.row);
                 opencv_core.cvDrawLine(coolwire, currentPoint, nextPoint,
-                        CvScalar.YELLOW, 1, 8, 0);
+                        CvScalar.CYAN, 1, 8, 0);
             }
             livewire.put(coolwire);
         }
@@ -445,7 +445,10 @@ public class LivewireApp
             return closed;
         }
 
-        private void showSegment(){
+        private static final String SEGMENT_TITLE = "Extracted Segment";
+        private static final String BOUNDARY_TITLE = "Boundary";
+
+        private void extractSegment(){
             CvMat boundaryImage = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
             CvMat mask = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
             opencv_core.cvZero(boundaryImage);
@@ -457,6 +460,7 @@ public class LivewireApp
                 CostMap.Node n = iter.next();
                 boundaryImage.put(n.row, n.col, 255);
             }
+            showImage(BOUNDARY_TITLE, boundaryImage, 100, 500);
 
             CvSeq contours = new CvSeq();
             opencv_imgproc.cvFindContours(
@@ -487,8 +491,8 @@ public class LivewireApp
                                 opencv_core.cvGet2D(origImage, i, j));
                 }
             }
-            showImage(SEGMENT_TITLE, segmentImage, 800, 100);
-            System.out.println("Segment extracted");
+            showImage(SEGMENT_TITLE, segmentImage, 600, 100);
+            System.out.println("Boundary and Segment extracted");
         }
 
     }
