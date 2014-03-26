@@ -11,6 +11,8 @@ import com.googlecode.javacv.cpp.opencv_core.CvSeq;
 import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_highgui;
+import com.googlecode.javacv.cpp.opencv_highgui.CvMouseCallback;
+import com.googlecode.javacv.cpp.opencv_highgui.CvButtonCallback;
 import com.googlecode.javacv.cpp.opencv_imgproc;
 
 import java.util.ArrayList;
@@ -81,6 +83,19 @@ public class LivewireApp
         showImage(APP_TITLE, origImage, 100, 100);
         opencv_highgui.cvSetMouseCallback(APP_TITLE, new MouseCallback(), null);
         opencv_highgui.cvWaitKey(0);
+
+//        while(true){
+//            int key = opencv_highgui.cvWaitKey(10);
+//
+//            if (closed){
+//                if (key == opencv_highgui.CV_EVENT_FLAG_CTRLKEY){
+//                    saveBoundaryAndSegment();
+//                    System.out.println("Saved");
+//                }
+//            else System.out.println(key);
+//            }
+//        }
+
     }
 
     /**
@@ -280,18 +295,22 @@ public class LivewireApp
      * An implementation of the CvMouseCallback for capturing mouse events within the
      * Livewire application
      */
-    private class MouseCallback extends opencv_highgui.CvMouseCallback
+    private class MouseCallback extends CvMouseCallback
     {
         private boolean seedset;
+        private boolean closed;
         private CvPoint currentPoint;
         private CvPoint nextPoint;
         private CostMap.Node seedNode;
         private CvMat livewire;
         private CvMat coolwire;
+        private CvMat boundaryImage;
+        private CvMat segmentImage;
         private List<CostMap.Node> boundary;
 
         public MouseCallback() {
             seedset = false;
+            closed = false;
 
             currentPoint = new CvPoint();
             nextPoint = new CvPoint();
@@ -300,11 +319,26 @@ public class LivewireApp
                     origImage.type(), origImage.channels());
             coolwire = CvMat.create(origImage.rows(), origImage.cols(),
                     origImage.type(), origImage.channels());
-
             livewire.put(origImage);
             coolwire.put(origImage);
 
+            boundaryImage = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
+            segmentImage = CvMat.create(origImage.rows(), origImage.cols(), origImage.type());
+            opencv_core.cvZero(boundaryImage);
+            opencv_core.cvZero(segmentImage);
+
             boundary = new ArrayList<CostMap.Node>(2000);
+
+//            while(true){
+//                int key = opencv_highgui.cvWaitKey(1);
+//
+//                if (closed){
+//                    if (key == 'S' || key == 's'){
+//                        saveBoundaryAndSegment();
+//                    }
+//                }
+//            }
+
         }
 
         /**
@@ -321,14 +355,15 @@ public class LivewireApp
         public void call(int event, int x, int y, int flags, Pointer param) {
             switch (event) {
                 case opencv_highgui.CV_EVENT_LBUTTONDOWN:
-                    if (!seedset || seedNode == null) {
+                    if (!closed && !seedset || seedNode == null) {
                         seedNode = costMap.snapToEdge(y, x, 7);
                         costMap.addSeed(seedNode.row, seedNode.col);
                         seedset = true;
                     }
-                    else{
+                    else if (!closed && seedset){
                         CostMap.Node current = costMap.getClosestEdge(y, x);
                         if (coolBoundary(current, seedNode)){
+                            closed = true;
                             seedset = false;
                             drawCoolWire();
                             extractSegment();
@@ -339,12 +374,18 @@ public class LivewireApp
                             costMap.addSeed(seedNode.row, seedNode.col);
                         }
                     }
+//                    else if (closed && !seedset){
+//                        if (flags == opencv_highgui.CV_EVENT_FLAG_CTRLKEY)
+//                            saveBoundaryAndSegment();
+//                    }
                     break;
-                case opencv_highgui.CV_EVENT_RBUTTONDOWN:
-                    seedset = false;
+                case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
+                    if (closed && !seedset)
+                        saveBoundaryAndSegment();
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONDBLCLK:
                     seedset = false;
+                    closed = false;
                     System.out.println("Boundary cleared");
                     opencv_highgui.cvDestroyWindow(BOUNDARY_TITLE);
                     opencv_highgui.cvDestroyWindow(SEGMENT_TITLE);
@@ -360,7 +401,12 @@ public class LivewireApp
             }
             if (seedset) drawLiveWire(costMap.getNode(y, x), seedNode);
             opencv_highgui.cvShowImage(APP_TITLE, livewire);
-            opencv_highgui.cvWaitKey(1);
+            int key = opencv_highgui.cvWaitKey(1);
+//            if (closed){
+//                if (key == 'S' || key == 's'){
+//                    saveBoundaryAndSegment();
+//                }
+//            }
         }
 
         /**
@@ -449,12 +495,13 @@ public class LivewireApp
         private static final String BOUNDARY_TITLE = "Boundary";
 
         private void extractSegment(){
-            CvMat boundaryImage = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
             CvMat mask = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
             opencv_core.cvZero(boundaryImage);
+            opencv_core.cvZero(segmentImage);
             opencv_core.cvZero(mask);
 
 
+            //put boundary points into binary boundary image
             Iterator<CostMap.Node> iter = boundary.iterator();
             while (iter.hasNext()){
                 CostMap.Node n = iter.next();
@@ -462,6 +509,8 @@ public class LivewireApp
             }
             showImage(BOUNDARY_TITLE, boundaryImage, 100, 500);
 
+
+            //extract boundary contour and create binary image mask
             CvSeq contours = new CvSeq();
             opencv_imgproc.cvFindContours(
                     boundaryImage,
@@ -479,9 +528,8 @@ public class LivewireApp
                 }
             }
 
-            CvMat segmentImage = CvMat.create(
-                    origImage.rows(), origImage.cols(), origImage.type());
-            opencv_core.cvZero(segmentImage);
+
+            //use mask to copy pixels within boundary to segmentImage
             for (int i = 0; i < mask.rows(); i++) {
                 for (int j = 0; j < mask.cols(); j++) {
                     if (mask.get(i, j) > 0)
@@ -493,6 +541,11 @@ public class LivewireApp
             }
             showImage(SEGMENT_TITLE, segmentImage, 600, 100);
             System.out.println("Boundary and Segment extracted");
+        }
+
+        private void saveBoundaryAndSegment(){
+            //TODO
+            System.out.println("Saved boundary and image segment");
         }
 
     }
