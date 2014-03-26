@@ -323,11 +323,13 @@ public class LivewireApp
                     }
                     else{
                         CostMap.Node current = costMap.getClosestEdge(y, x);
-                        boolean closed = coolBoundary(current, seedNode);
+                        if (coolBoundary(current, seedNode)){
+                            System.out.println("Boundary is closed");
+                            seedset = false;
+                        }
+                        drawCoolWire();
                         seedNode = current;
                         costMap.addSeed(seedNode.row, seedNode.col);
-                        if (closed)
-                            System.out.println("CLOSED");
                     }
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONDOWN:
@@ -342,11 +344,11 @@ public class LivewireApp
                     break;
                 case opencv_highgui.CV_EVENT_MOUSEMOVE:
                     if (seedset) {
-//                        drawWire(costMap.getNode(y, x), seedNode);
+//                        drawLiveWire(costMap.getNode(y, x), seedNode);
                     }
                     break;
             }
-            if (seedset) drawWire(costMap.getNode(y, x), seedNode);
+            if (seedset) drawLiveWire(costMap.getNode(y, x), seedNode);
             opencv_highgui.cvShowImage(APP_TITLE, livewire);
             opencv_highgui.cvWaitKey(1);
         }
@@ -357,26 +359,30 @@ public class LivewireApp
          *
          * @param current the start Node to cool the boundary from
          * @param lastseed the last seedpoint to cool the boundary to.
+         * @return true if the cooled boundary is closed, false otherwise
          */
         private boolean coolBoundary(CostMap.Node current, CostMap.Node lastseed){
             boolean closed = false;
+            CostMap.Node n = current;
+            int redundantCount = 0;
             ArrayList<CostMap.Node> buffer = new ArrayList<CostMap.Node>();
-            while (!current.equals(lastseed) && current.parent != null){
-                currentPoint.put(current.col, current.row);
-                nextPoint.put(current.parent.col, current.parent.row);
-                opencv_core.cvDrawLine(coolwire, currentPoint, nextPoint,
-                        CvScalar.YELLOW, 1, 8, 0);
-
-                if (!boundary.isEmpty() && boundary.get(0).equals(current)) {
+            while (!n.equals(lastseed) && n.parent != null){
+                if (!boundary.isEmpty() && boundary.get(0).equals(n))
                     closed = true;
-//                    break;
-                }
 
-                buffer.add(current);
-                current = current.parent;
+                if (!closed)
+                    redundantCount++;
+
+                buffer.add(n);
+                n = n.parent;
             }
             Collections.reverse(buffer);
             boundary.addAll(buffer);
+            System.out.println(boundary);
+
+            //remove redundant nodes
+            if (closed)
+                boundary = boundary.subList(0, boundary.size() - redundantCount - 1);
 
             return closed;
         }
@@ -387,7 +393,7 @@ public class LivewireApp
          * @param start the start Node to draw the boundary from
          * @param end   the end Node to draw the boundary to
          */
-        private void drawWire(CostMap.Node start, CostMap.Node end) {
+        private void drawLiveWire(CostMap.Node start, CostMap.Node end) {
             livewire.put(coolwire);
             while (!start.equals(end) && start.parent != null) {
                 currentPoint.put(start.col, start.row);
@@ -396,6 +402,19 @@ public class LivewireApp
                         CvScalar.RED, 1, 8, 0);
                 start = start.parent;
             }
+        }
+
+        private void drawCoolWire() {
+            CostMap.Node n;
+            for (int i = 0; i < boundary.size() -1; i++) {
+                n = boundary.get(i);
+                currentPoint.put(n.col, n.row);
+                n = boundary.get(i + 1);
+                nextPoint.put(n.col, n.row);
+                opencv_core.cvDrawLine(coolwire, currentPoint, nextPoint,
+                        CvScalar.YELLOW, 1, 8, 0);
+            }
+            livewire.put(coolwire);
         }
 
         private boolean isBoundaryClosed(){
