@@ -467,6 +467,8 @@ public class LivewireApp
             }
             showImage(SEGMENT_TITLE, segmentImage, 600, 100);
             System.out.println("Boundary and image segment extracted");
+            System.out.println("To save boundary and segment, double-click LEFT mouse button over Live-wire app.");
+            System.out.println("To clear current boundary, double-click RIGHT mouse button over Live-wire app.");
         }
 
         private void saveBoundaryAndSegment(){
