@@ -1,10 +1,14 @@
 package livewire;
 
+import com.googlecode.javacpp.Loader;
 import com.googlecode.javacpp.Pointer;
 import com.googlecode.javacv.cpp.opencv_core;
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import com.googlecode.javacv.cpp.opencv_core.CvPoint;
+import com.googlecode.javacv.cpp.opencv_core.CvPoint2D32f;
 import com.googlecode.javacv.cpp.opencv_core.CvScalar;
+import com.googlecode.javacv.cpp.opencv_core.CvSeq;
+import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_highgui;
 import com.googlecode.javacv.cpp.opencv_imgproc;
@@ -443,27 +447,38 @@ public class LivewireApp
 //            opencv_core.CvSeqBlock block;
 //            CvChain contour = new CvChain(boundary.size());
 //            opencv_ml.CvVectors t = new opencv_ml.CvVectors(boundary.size());
-            CvMat contour = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
+            CvMat boundaryImage = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
             CvMat mask = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
-            opencv_core.cvZero(contour);
+            opencv_core.cvZero(boundaryImage);
             opencv_core.cvZero(mask);
 
+//            opencv_core.CvPoint2D32f p = new opencv_core.CvPoint2D32f(0, 0);
+//            opencv_core.CvPoint2D32f[] points = new opencv_core.CvPoint2D32f[10];
+//            opencv_imgproc.cvPointPolygonTest(contour, p, 0);
 
             Iterator<CostMap.Node> iter = boundary.iterator();
             while (iter.hasNext()){
                 CostMap.Node n = iter.next();
-                contour.put(n.row, n.col, 255);
+                boundaryImage.put(n.row, n.col, 255);
             }
-            showImage("Boundary", contour, 800, 100);
+            showImage("Boundary", boundaryImage, 800, 100);
 
-//            CvPoint2D32f point = new CvPoint2D32f();
-//            for (int i = 0; i < contour.rows(); i++) {
-//                for (int j = 0; j < contour.cols(); j++) {
-//                    point.put(j, i);
-//                    if (opencv_imgproc.cvPointPolygonTest(contour, point, 1) >= 0)
-//                        mask.put(i, j, 255);
-//                }
-//            }
+            CvSeq contours = new CvSeq();
+            opencv_imgproc.cvFindContours(
+                    boundaryImage,
+                    CvMemStorage.create(),
+                    contours,
+                    Loader.sizeof(opencv_core.CvContour.class),
+                    opencv_imgproc.CV_RETR_LIST,
+                    opencv_imgproc.CV_CHAIN_APPROX_SIMPLE);
+            CvPoint2D32f point = new CvPoint2D32f();
+            for (int i = 0; i < boundaryImage.rows(); i++) {
+                for (int j = 0; j < boundaryImage.cols(); j++) {
+                    point.put(j, i);
+                    if (opencv_imgproc.cvPointPolygonTest(contours, point, 0) >= 0)
+                        mask.put(i, j, 255);
+                }
+            }
             showImage("Segment Mask", mask, 100, 600);
 //            opencv_highgui.cvWaitKey(1);
         }
