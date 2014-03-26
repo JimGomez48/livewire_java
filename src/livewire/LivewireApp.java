@@ -461,7 +461,6 @@ public class LivewireApp
                 CostMap.Node n = iter.next();
                 boundaryImage.put(n.row, n.col, 255);
             }
-            showImage("Boundary", boundaryImage, 800, 100);
 
             CvSeq contours = new CvSeq();
             opencv_imgproc.cvFindContours(
@@ -479,8 +478,20 @@ public class LivewireApp
                         mask.put(i, j, 255);
                 }
             }
-            showImage("Segment Mask", mask, 100, 600);
-//            opencv_highgui.cvWaitKey(1);
+
+            CvMat segmentImage = CvMat.create(
+                    origImage.rows(), origImage.cols(), origImage.type());
+            opencv_core.cvZero(segmentImage);
+            for (int i = 0; i < mask.rows(); i++) {
+                for (int j = 0; j < mask.cols(); j++) {
+                    if (mask.get(i, j) > 0)
+                        opencv_core.cvSet2D(
+                                segmentImage,
+                                i, j,
+                                opencv_core.cvGet2D(origImage, i, j));
+                }
+            }
+            showImage("Segment", segmentImage, 800, 100);
         }
 
     }
