@@ -11,6 +11,7 @@ import com.googlecode.javacv.cpp.opencv_imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -327,6 +328,7 @@ public class LivewireApp
                             System.out.println("Boundary is closed");
                             seedset = false;
                             drawCoolWire();
+                            showSegment();
                         }
                         else{
                             drawCoolWire();
@@ -434,6 +436,36 @@ public class LivewireApp
             }
 
             return closed;
+        }
+
+        private void showSegment(){
+//            CvSeq contour = new CvSeq(boundary.size());
+//            opencv_core.CvSeqBlock block;
+//            CvChain contour = new CvChain(boundary.size());
+//            opencv_ml.CvVectors t = new opencv_ml.CvVectors(boundary.size());
+            CvMat contour = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
+            CvMat mask = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
+            opencv_core.cvZero(contour);
+            opencv_core.cvZero(mask);
+
+
+            Iterator<CostMap.Node> iter = boundary.iterator();
+            while (iter.hasNext()){
+                CostMap.Node n = iter.next();
+                contour.put(n.row, n.col, 255);
+            }
+            showImage("Boundary", contour, 800, 100);
+
+//            CvPoint2D32f point = new CvPoint2D32f();
+//            for (int i = 0; i < contour.rows(); i++) {
+//                for (int j = 0; j < contour.cols(); j++) {
+//                    point.put(j, i);
+//                    if (opencv_imgproc.cvPointPolygonTest(contour, point, 1) >= 0)
+//                        mask.put(i, j, 255);
+//                }
+//            }
+            showImage("Segment Mask", mask, 100, 600);
+//            opencv_highgui.cvWaitKey(1);
         }
 
     }
