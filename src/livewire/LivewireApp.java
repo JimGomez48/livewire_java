@@ -12,7 +12,6 @@ import com.googlecode.javacv.cpp.opencv_core.CvMemStorage;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.googlecode.javacv.cpp.opencv_highgui;
 import com.googlecode.javacv.cpp.opencv_highgui.CvMouseCallback;
-import com.googlecode.javacv.cpp.opencv_highgui.CvButtonCallback;
 import com.googlecode.javacv.cpp.opencv_imgproc;
 
 import java.util.ArrayList;
@@ -83,19 +82,6 @@ public class LivewireApp
         showImage(APP_TITLE, origImage, 100, 100);
         opencv_highgui.cvSetMouseCallback(APP_TITLE, new MouseCallback(), null);
         opencv_highgui.cvWaitKey(0);
-
-//        while(true){
-//            int key = opencv_highgui.cvWaitKey(10);
-//
-//            if (closed){
-//                if (key == opencv_highgui.CV_EVENT_FLAG_CTRLKEY){
-//                    saveBoundaryAndSegment();
-//                    System.out.println("Saved");
-//                }
-//            else System.out.println(key);
-//            }
-//        }
-
     }
 
     /**
@@ -322,23 +308,12 @@ public class LivewireApp
             livewire.put(origImage);
             coolwire.put(origImage);
 
-            boundaryImage = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
+            boundaryImage = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U, 1);
             segmentImage = CvMat.create(origImage.rows(), origImage.cols(), origImage.type());
             opencv_core.cvZero(boundaryImage);
             opencv_core.cvZero(segmentImage);
 
             boundary = new ArrayList<CostMap.Node>(2000);
-
-//            while(true){
-//                int key = opencv_highgui.cvWaitKey(1);
-//
-//                if (closed){
-//                    if (key == 'S' || key == 's'){
-//                        saveBoundaryAndSegment();
-//                    }
-//                }
-//            }
-
         }
 
         /**
@@ -366,7 +341,7 @@ public class LivewireApp
                             closed = true;
                             seedset = false;
                             drawCoolWire();
-                            extractSegment();
+                            extractBoundarySegment();
                         }
                         else{
                             drawCoolWire();
@@ -374,10 +349,6 @@ public class LivewireApp
                             costMap.addSeed(seedNode.row, seedNode.col);
                         }
                     }
-//                    else if (closed && !seedset){
-//                        if (flags == opencv_highgui.CV_EVENT_FLAG_CTRLKEY)
-//                            saveBoundaryAndSegment();
-//                    }
                     break;
                 case opencv_highgui.CV_EVENT_LBUTTONDBLCLK:
                     if (closed && !seedset)
@@ -393,30 +364,12 @@ public class LivewireApp
                     coolwire.put(origImage);
                     boundary.clear();
                     break;
-//                case opencv_highgui.CV_EVENT_MOUSEMOVE:
-//                    if (seedset) {
-//                        drawLiveWire(costMap.getNode(y, x), seedNode);
-//                    }
-//                    break;
             }
             if (seedset) drawLiveWire(costMap.getNode(y, x), seedNode);
             opencv_highgui.cvShowImage(APP_TITLE, livewire);
-            int key = opencv_highgui.cvWaitKey(1);
-//            if (closed){
-//                if (key == 'S' || key == 's'){
-//                    saveBoundaryAndSegment();
-//                }
-//            }
+            opencv_highgui.cvWaitKey(1);
         }
 
-        /**
-         * Cools a portion of the boundary. That portion will no longer be subject to
-         * change as the mouse cursor moves
-         *
-         * @param current the start Node to cool the boundary from
-         * @param lastseed the last seedpoint to cool the boundary to.
-         * @return true if the cooled boundary is closed, false otherwise
-         */
         private boolean coolBoundary(CostMap.Node current, CostMap.Node lastseed){
             boolean closed = false;
             CostMap.Node n = current;
@@ -444,12 +397,6 @@ public class LivewireApp
             return closed;
         }
 
-        /**
-         * Draws the livewire boundary onto the livewire image
-         *
-         * @param start the start Node to draw the boundary from
-         * @param end   the end Node to draw the boundary to
-         */
         private void drawLiveWire(CostMap.Node start, CostMap.Node end) {
             livewire.put(coolwire);
             while (!start.equals(end) && start.parent != null) {
@@ -474,32 +421,13 @@ public class LivewireApp
             livewire.put(coolwire);
         }
 
-        private boolean isBoundaryClosed(){
-            boolean closed = false;
-            CostMap.Node seed = boundary.get(0);
-            int count = 0;
-
-            for (int i = boundary.size() - 1; i >= 1; i--) {
-                CostMap.Node n = boundary.get(i);
-                if (n.equals(seed)) {
-                    closed = true;
-                }
-                //only check the end 20% of the boundary
-                if (count >= 0.2*boundary.size()) break;
-            }
-
-            return closed;
-        }
-
-        private static final String SEGMENT_TITLE = "Extracted Segment";
+        private static final String SEGMENT_TITLE = "Segment";
         private static final String BOUNDARY_TITLE = "Boundary";
-
-        private void extractSegment(){
+        private void extractBoundarySegment(){
             CvMat mask = CvMat.create(origImage.rows(), origImage.cols(), opencv_core.CV_8U);
             opencv_core.cvZero(boundaryImage);
             opencv_core.cvZero(segmentImage);
             opencv_core.cvZero(mask);
-
 
             //put boundary points into binary boundary image
             Iterator<CostMap.Node> iter = boundary.iterator();
@@ -508,7 +436,6 @@ public class LivewireApp
                 boundaryImage.put(n.row, n.col, 255);
             }
             showImage(BOUNDARY_TITLE, boundaryImage, 100, 500);
-
 
             //extract boundary contour and create binary image mask
             CvSeq contours = new CvSeq();
@@ -528,7 +455,6 @@ public class LivewireApp
                 }
             }
 
-
             //use mask to copy pixels within boundary to segmentImage
             for (int i = 0; i < mask.rows(); i++) {
                 for (int j = 0; j < mask.cols(); j++) {
@@ -540,11 +466,12 @@ public class LivewireApp
                 }
             }
             showImage(SEGMENT_TITLE, segmentImage, 600, 100);
-            System.out.println("Boundary and Segment extracted");
+            System.out.println("Boundary and image segment extracted");
         }
 
         private void saveBoundaryAndSegment(){
-            //TODO
+            opencv_highgui.cvSaveImage("boundary.jpg", boundaryImage);
+            opencv_highgui.cvSaveImage("segment.jpg", segmentImage);
             System.out.println("Saved boundary and image segment");
         }
 
@@ -567,16 +494,18 @@ public class LivewireApp
     private static void printInstructions(){
         System.out.println("\nINSTRUCTIONS");
         System.out.println("==============");
-        System.out.println("- Click near an edge to generate a starting seed point.");
+        System.out.println("- Left-click near an edge to generate a starting seed point.");
         System.out.println("- Drag the cursor around the image to adjust the boundary.");
         System.out.println("- To cool current boundary, left-click again near a desired edge.");
-        System.out.println("- To clear current boundary, double-click right mouse button.");
-        System.out.println("- To close off boundary, overlap free end with current boundary tail.");
-        System.out.println("   The app will detect boundary closure and stop tracing. It will");
-        System.out.println("   then display the extracted boundary and image segment.");
-        System.out.println("- Press enter to save the current segment to disk, or double-click.");
-        System.out.println("   the right mouse button to clear the current boundary.");
-        System.out.println("- Press enter at any time to exit the app.");
+        System.out.println("- To clear current boundary, double-click RIGHT mouse button.");
+        System.out.println("- To close off boundary, overlap free end with current boundary tail");
+        System.out.println("   and left-click. The app will detect boundary closure and stop");
+        System.out.println("   tracing. It will then display the extracted boundary and image");
+        System.out.println("   segment.");
+        System.out.println("- Double-click the LEFT mouse button to save the current segment to");
+        System.out.println("   disk, or double-click the RIGHT mouse button to clear the current");
+        System.out.println("   boundary.");
+        System.out.println("- Press any key at any time to exit the app.");
         System.out.println();
     }
 

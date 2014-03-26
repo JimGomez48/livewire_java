@@ -12,4 +12,5 @@ out/*
 out/production/livewire_java/*
 
 *.jar
+*.jpg
 src/META-INF/*
