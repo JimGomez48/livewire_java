@@ -326,10 +326,13 @@ public class LivewireApp
                         if (coolBoundary(current, seedNode)){
                             System.out.println("Boundary is closed");
                             seedset = false;
+                            drawCoolWire();
                         }
-                        drawCoolWire();
-                        seedNode = current;
-                        costMap.addSeed(seedNode.row, seedNode.col);
+                        else{
+                            drawCoolWire();
+                            seedNode = current;
+                            costMap.addSeed(seedNode.row, seedNode.col);
+                        }
                     }
                     break;
                 case opencv_highgui.CV_EVENT_RBUTTONDOWN:
@@ -378,7 +381,6 @@ public class LivewireApp
             }
             Collections.reverse(buffer);
             boundary.addAll(buffer);
-            System.out.println(boundary);
 
             //remove redundant nodes
             if (closed)
