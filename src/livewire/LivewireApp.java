@@ -513,17 +513,17 @@ public class LivewireApp
 
     private static void printInstructions(){
         System.out.println("\nINSTRUCTIONS");
-        System.out.println("======================");
-        System.out.println("- Click near an edge to generate a seed point");
-        System.out.println("- Drag the cursor around the image to adjust the boundary");
-        System.out.println("- To cool current boundary, left-click again near a desired edge");
-        System.out.println("- To clear current boundary, double-click right mouse button");
+        System.out.println("==============");
+        System.out.println("- Click near an edge to generate a starting seed point.");
+        System.out.println("- Drag the cursor around the image to adjust the boundary.");
+        System.out.println("- To cool current boundary, left-click again near a desired edge.");
+        System.out.println("- To clear current boundary, double-click right mouse button.");
         System.out.println("- To close off boundary, overlap free end with current boundary tail.");
-        System.out.println("  The app will detect boundary closure and stop tracing. It will then");
-        System.out.println("  display the extracted image segment.");
-        System.out.println("- Press enter to save the current segment to disk, or double-click");
-        System.out.println("  the right mouse button to clear the current boundary");
-        System.out.println("- Press enter at any time to exit the app");
+        System.out.println("   The app will detect boundary closure and stop tracing. It will");
+        System.out.println("   then display the extracted boundary and image segment.");
+        System.out.println("- Press enter to save the current segment to disk, or double-click.");
+        System.out.println("   the right mouse button to clear the current boundary.");
+        System.out.println("- Press enter at any time to exit the app.");
         System.out.println();
     }
 
