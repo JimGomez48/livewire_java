@@ -403,7 +403,7 @@ public class LivewireApp
                 currentPoint.put(start.col, start.row);
                 nextPoint.put(start.parent.col, start.parent.row);
                 opencv_core.cvDrawLine(livewire, currentPoint, nextPoint,
-                        CvScalar.RED, 1, 8, 0);
+                        CvScalar.RED, 2, 8, 0);
                 start = start.parent;
             }
         }
@@ -416,7 +416,7 @@ public class LivewireApp
                 n = boundary.get(i + 1);
                 nextPoint.put(n.col, n.row);
                 opencv_core.cvDrawLine(coolwire, currentPoint, nextPoint,
-                        CvScalar.CYAN, 1, 8, 0);
+                        CvScalar.CYAN, 2, 8, 0);
             }
             livewire.put(coolwire);
         }
