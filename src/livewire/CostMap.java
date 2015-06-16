@@ -7,10 +7,10 @@ import java.util.*;
 
 
 /**
- * CostMap is used to calculate and store the cumulative costs of the image pixels
- * from a given seedpoint. It uses a variation of Dijkstra's shortest path algorithm
- * to expand the image pixel graph and calculate least cost paths from the seed point
- * to all other pixels in the image.
+ * CostMap is used to calculate and store the cumulative costs of the image
+ * pixels from a given seedpoint. It uses a variation of Dijkstra's shortest
+ * path algorithm to expand the image pixel graph and calculate least cost
+ * paths from the seed point to all other pixels in the image.
  *
  * @author James Gomez
  */
@@ -33,7 +33,10 @@ public class CostMap
         public short col;
         /** the current cumulative cost of this node from the seed point */
         public int cost;
-        /** the next node along the lowest cost path from this node to the seed */
+        /**
+         * the next node along the lowest cost path from this node to the
+         * seed
+         */
         public Node parent;
 
         public boolean equals(Node n) {
@@ -92,9 +95,9 @@ public class CostMap
     }
 
     /**
-     * Sets a seedpoint as the starting point of the expansion algorithm. A call to
-     * this method triggers the expansion algorithm to run, generating cumulative
-     * costs and parents pointers.
+     * Sets a seedpoint as the starting point of the expansion algorithm. A call
+     * to this method triggers the expansion algorithm to run,
+     * generating cumulative costs and parents pointers.
      *
      * @param row the pixel row of the starting seedpoint
      * @param col the column of the starting seedpoint
@@ -159,8 +162,10 @@ public class CostMap
     }
 
     /**
-     * Generates cumulative costs and parent pointers using a variation of Dijkstra's
-     * shortest path algorithm. The resultant min-cost tree is stored in a 2-D array
+     * Generates cumulative costs and parent pointers using a variation of
+     * Dijkstra's
+     * shortest path algorithm. The resultant min-cost tree is stored in a
+     * 2-D array
      */
     private void expand(int row, int col) {
         //create algorithm data structures COMPARE VIA CUM COST
@@ -212,8 +217,8 @@ public class CostMap
             }
 
             if (count % step == 0) {
-                System.out.println("Expanding:  " + (int) (100 * (count / size)) +
-                        "%");
+                System.out.println(
+                        "Expanding:  " + (int)(100 * (count/size)) + "%");
             }
             count++;
         }
@@ -229,7 +234,8 @@ public class CostMap
                 //skip node n
                 if (i == n.row && j == n.col) continue;
                 //check if current neighbor is within image bounds
-                if (i >= 0 && j >= 0 && i < costs.length && j < costs[0].length) {
+                if (i >= 0 && j >= 0 && i < costs.length && j < costs[0]
+                        .length) {
                     neighbors.add(costs[i][j]);
                 }
             }
@@ -238,7 +244,10 @@ public class CostMap
         return neighbors;
     }
 
-    /** @return the euclidean-scaled cumulative cost from Node current to Node n */
+    /**
+     * @return the euclidean-scaled cumulative cost from Node current to
+     * Node n
+     */
     private int euclideanAdd(Node current, Node n) {
         //if diagonal, scale by RAD2
         if (current.row != n.row && current.col != n.col)
